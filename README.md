@@ -5,8 +5,20 @@
 Ardoqpy is a thin client library for the [Ardoq](https://ardoq.com) REST API.
 
 ## Documentation
+(see the test client for examples)
 
-You're reading it
+Implemented:
+- workspaces
+    - get all
+    - get by ID
+    - create
+    - delete
+- components
+    - get
+    - create
+- references
+- models
+    - get by ID
 
 
 ## Installation
@@ -16,7 +28,7 @@ just clone it and use it as you need to
 
 ## Dependencies
 
-- [Requests](https://github.com/kennethreitz/requests) - ardoqpy requires the requests package to be installed
+- [Requests](https://github.com/kennethreitz/requests) - ardoqpy uses requests package for http requests
 
 
 ## Quick Start
@@ -29,9 +41,9 @@ To get started, simply install ardoqpy, reate an ArdoqClient object and call met
 
 or from the console
     from ardoq
->>> from ardoqpy.ardoqpy import ArdoqClient
->>> ardoq = ardoqpy.ArdoqClient(hosturl='https://app.ardoq.com', token='_your token_', org='ardoq')
->>> ardoq.get_workspaces()
+    from ardoqpy.ardoqpy import ArdoqClient
+    ardoq = ardoqpy.ArdoqClient(hosturl='https://app.ardoq.com', token='_your token_', org='ardoq')
+    ardoq.get_workspaces()
 
 ## Version
 
