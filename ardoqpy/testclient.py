@@ -3,7 +3,7 @@
 from ardoqpy import ArdoqClient
 import json
 import configparser
-import os
+import sys, os
 
 configfile = "./testardoqpy.cfg"
 # configfile = "./ardoqpy.cfg"
@@ -30,19 +30,26 @@ def main():
         print('name: ', w['name'], ' - id: ', w['_id'])
 
     print('--- create a workspace of type Application Service ---')
-    python_workspace = {'description': 'workspace for python test client', 'componentModel': '56f2b68672fa6d045996f74a', 'name': 'wsPythonClient'}
-    python_ws = ardoq.create_workspace(python_workspace)
-    print (json.dumps(python_ws, sort_keys=True, indent=4))
+    new_workspace = {'description': 'workspace for python test client', 'componentModel': '56f2b68672fa6d045996f74a', 'name': 'wsPythonClient'}
+    workspace = ardoq.create_workspace(new_workspace)
+    # print (json.dumps(python_ws, sort_keys=True, indent=4))
+    print("created workspace " + workspace['_id'], ' : ', workspace['name'])
 
     print('')
     print('--- getting workspace by ID ---')
-    workspace = ardoq.get_workspace(wsId='56f2cc7f72fa6d045996f758')
+    workspace = ardoq.get_workspace(ws_id=workspace['_id'])
     print("workspace " + workspace['_id'], ' : ', workspace['name'])
 
     print('')
-    print('--- getting workspace by name ---')
-    workspace = ardoq.get_workspace(wsName='wsAS')
-    print("workspace " + workspace['_id'], ' : ', workspace['name'])
+    print('--- delete the new workspace ---')
+    del_workspace = ardoq.del_workspace(workspace['_id'])
+    print('delete: ', del_workspace)
+
+    print('--- create another workspace of type Application Service ---')
+    new_workspace = {'description': 'workspace for python test client', 'componentModel': '56f2b68672fa6d045996f74a', 'name': 'wsPythonClient'}
+    workspace = ardoq.create_workspace(new_workspace)
+    # print (json.dumps(python_ws, sort_keys=True, indent=4))
+    print("created workspace " + workspace['_id'], ' : ', workspace['name'])
 
     print('')
     print('--- getting model and show the top level componentTypes ---')
@@ -51,7 +58,7 @@ def main():
         print ('componentType: ', v['name'], ' : typeId ', k)
 
     print('')
-    print('--- adding a compone to a selected workspace ---')
+    print('--- adding a component to a selected workspace ---')
     component = {'description': 'some descript', 'parent': None, 'rootWorkspace': '56f2cc7f72fa6d045996f758', 'typeId': 'p1458752640732', 'name': 'another comp'}
     newcomp = ardoq.create_component(component)
     # print (json.dumps(comp, sort_keys=True, indent=4))

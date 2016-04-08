@@ -34,7 +34,6 @@ class BadRequest(ArdoqClientException):
 class ArdoqClient(object):
     '''
         Example usage::
-            import ardoqpy
             ...
     '''
     def __init__(self, hosturl='https://app.ardoq.com/', token=None, org='ardoq'):
@@ -59,24 +58,26 @@ class ArdoqClient(object):
     @staticmethod
     def _unwrap_response(resp):
         code = resp.status_code
-        # TODO: check for error before getting the json
-        json = resp.json()
         # errmsg = json.get('error', {}).get('message', 'Unknown error')
+        errmsg = "how about a better errmsg"
 
         if code == 200 or code == 201:
+            json = resp.json()
             return json
         elif code == 204:
             return {}
         elif code == 400:
-            raise BadRequest(errmsg)
+            raise BadRequest(json = resp.json())
         elif code == 401:
             raise AuthorizationError(errmsg)
         elif code == 404:
             raise NotFoundError(errmsg)
+        elif code == 409:
+            raise ArdoqClientException(code, " : ", errmsg)
         elif code == 503:
             raise ServiceUnavailable(errmsg)
         else:
-            raise ArdoqClientException('%d: %s' % (code, errmsg))
+            raise ArdoqClientException(code, " : ", errmsg)
 
     def _get(self, resrc, **kwargs):
         url = self.baseurl + resrc
@@ -86,7 +87,6 @@ class ArdoqClient(object):
         resp = self.session.get(url, params=kwargs)
         return self._unwrap_response(resp)
 
-
     def _post(self, resrc, payload, **kwargs):
         url = self.baseurl + resrc
         kwargs.update({
@@ -94,7 +94,6 @@ class ArdoqClient(object):
         })
         resp = self.session.post(url, json=payload, params=kwargs)
         return self._unwrap_response(resp)
-
 
     def _delete(self, resrc, **kwargs):
         url = self.baseurl + resrc
@@ -104,31 +103,29 @@ class ArdoqClient(object):
         resp = self.session.delete(url, params=kwargs)
         return self._unwrap_response(resp)
 
-
+    '''
+    functions for workspaces
+    '''
+    # get all workspaces
     def get_workspaces(self):
         self.workspaces = self._get('workspace')
         return self.workspaces
 
-
-    # gets the workspace using either the worksspace ID or name
-    def get_workspace(self, wsId=None, wsName=None):
+    # gets the workspace using either the workspace ID or name
+    # TODO need to check if the ID or name is in the existing workspaces...
+    # TODO: change this to only get the workspace by ID.
+    #       need a different function to find the id by name
+    def get_workspace(self, ws_id=None):
+        if ws_id is None:
+            raise ArdoqClientException("need an id for get_workspace")
+        ws_index = None
         if self.workspaces is not None:
-            if wsId is None and wsName is None:
-                raise ArdoqClientException("need an arg for get_workspace")
-            wsIndex = -1
-            if wsId is not None:
-                for i, v in enumerate(self.workspaces):
-                    if v['_id'] == wsId:
-                        wsIndex = i
-            else:
-                for i, v in enumerate(self.workspaces):
-                    if v['name'] == wsName:
-                        wsIndex = i
-            self.workspace = self.workspaces[wsIndex]
-        else:
-            if wsId is None:
-                raise ArdoqClientException("Don't have the workspaces yet, I'll need the workspace ID to get the ws")
-            self.workspace = self._get('workspace' + '/' + wsId)
+            for i, v in enumerate(self.workspaces):
+                if v['_id'] == ws_id:
+                    ws_index = i
+                    self.workspace = self.workspaces[ws_index]
+        if ws_index is None or self.workspaces is None:
+            self.workspace = self._get('workspace' + '/' + ws_id)
         return self.workspace
 
     def create_workspace(self, ws=None):
@@ -137,6 +134,16 @@ class ArdoqClient(object):
         res = self._post('workspace', ws)
         return res
 
+    # delete a workspace
+    def del_workspace(self, ws_id = None):
+        if ws_id is None:
+            raise ArdoqClientException('must provide a workspace id')
+        res = self._delete('workspace/' + ws_id)
+        return res
+
+    '''
+    functions for models
+    '''
     # get the model for a given workspace id
     def get_model(self, wsId=None):
         if wsId is None:
@@ -146,6 +153,9 @@ class ArdoqClient(object):
         #   start by defaulting to the current workspace
         return self.model
 
+    '''
+    functions for components
+    '''
     # post a new component
     def create_component(self, comp=None):
         if comp is None:
@@ -158,4 +168,8 @@ class ArdoqClient(object):
             raise ArdoqClientException('must provide a component id')
         comp = self._get('component/' + comp_id)
         return comp
+
+    '''
+    functions for references
+    '''
 
