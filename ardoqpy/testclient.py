@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from ardoqpy import ArdoqClient
+import ardoqpy
 import json
 import configparser
 import sys, os
@@ -20,7 +20,7 @@ def get_config():
 def main():
     get_config()
     print('read config: ', os.getcwd(), ' ', config.sections())
-    ardoq = ArdoqClient(hosturl=config['Ardoq']['host'], token=config['Ardoq']['token'], org=config['Ardoq']['org'])
+    ardoq = ardoqpy.ArdoqClient(hosturl=config['Ardoq']['host'], token=config['Ardoq']['token'], org=config['Ardoq']['org'])
 
     print('')
     print('--- getting workspaces ---')
@@ -53,13 +53,13 @@ def main():
 
     print('')
     print('--- getting model and show the top level componentTypes ---')
-    model = ardoq.get_model(wsId='could be anything')
+    model = ardoq.get_model(ws_id=workspace['_id'])
     for k, v, in model["root"].items():
         print ('componentType: ', v['name'], ' : typeId ', k)
 
     print('')
     print('--- adding a component to a selected workspace ---')
-    component = {'description': 'some descript', 'parent': None, 'rootWorkspace': '56f2cc7f72fa6d045996f758', 'typeId': 'p1458752640732', 'name': 'another comp'}
+    component = {'description': 'some descript', 'parent': None, 'rootWorkspace': workspace['_id'], 'typeId': 'p1458752640732', 'name': 'another comp'}
     newcomp = ardoq.create_component(component)
     # print (json.dumps(comp, sort_keys=True, indent=4))
     print('added comp: ', newcomp['_id'], ', with name: ', newcomp['name'])

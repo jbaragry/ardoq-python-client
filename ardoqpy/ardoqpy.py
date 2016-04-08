@@ -1,6 +1,7 @@
 # coding: utf-8
 
 import requests
+import json
 
 '''
     A simple and thin Python library for the Ardoq REST API
@@ -58,12 +59,15 @@ class ArdoqClient(object):
     @staticmethod
     def _unwrap_response(resp):
         code = resp.status_code
-        # errmsg = json.get('error', {}).get('message', 'Unknown error')
-        errmsg = "how about a better errmsg"
+        if "application/json" not in resp.headers['content-type'] or 'no content' in resp.reason.lower():
+            json_payload = {}
+        else:
+            json_payload = resp.json()
+            # TODO: need to deal with errors that return JSON
+        errmsg = resp.reason
 
         if code == 200 or code == 201:
-            json = resp.json()
-            return json
+            return json_payload
         elif code == 204:
             return {}
         elif code == 400:
@@ -145,12 +149,12 @@ class ArdoqClient(object):
     functions for models
     '''
     # get the model for a given workspace id
-    def get_model(self, wsId=None):
-        if wsId is None:
+    def get_model(self, ws_id=None):
+        if ws_id is None:
             raise ArdoqClientException('must provide a workspaceID')
+        if self.workspace['_id'] != ws_id:
+            self.workspace = self._get('workspace' + '/' + ws_id)
         self.model = self._get('model' + '/' + self.workspace['componentModel'])
-        # TODO need to check if I have this workspace already, otherwise get it
-        #   start by defaulting to the current workspace
         return self.model
 
     '''

@@ -2,7 +2,7 @@
 
 ## Description
 
-Ardoqpy is a thin client library for the Ardoq REST API.
+Ardoqpy is a thin client library for the [Ardoq](https://ardoq.com) REST API.
 
 ## Documentation
 
