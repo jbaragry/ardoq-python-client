@@ -59,29 +59,16 @@ class ArdoqClient(object):
     @staticmethod
     def _unwrap_response(resp):
         code = resp.status_code
-        if "application/json" not in resp.headers['content-type'] or 'no content' in resp.reason.lower():
-            json_payload = {}
-        else:
-            json_payload = resp.json()
-            # TODO: need to deal with errors that return JSON
-        errmsg = resp.reason
 
         if code == 200 or code == 201:
-            return json_payload
+            if len(resp.json()) == 0: # is no workspaces then there is no json response
+                return {}
+            else:
+                return resp.json()
         elif code == 204:
             return {}
-        elif code == 400:
-            raise BadRequest(json = resp.json())
-        elif code == 401:
-            raise AuthorizationError(errmsg)
-        elif code == 404:
-            raise NotFoundError(errmsg)
-        elif code == 409:
-            raise ArdoqClientException(code, " : ", errmsg)
-        elif code == 503:
-            raise ServiceUnavailable(errmsg)
         else:
-            raise ArdoqClientException(code, " : ", errmsg)
+            raise ArdoqClientException({'code': code, 'errmsg': resp.reason})
 
     def _get(self, resrc, **kwargs):
         url = self.baseurl + resrc
@@ -167,11 +154,20 @@ class ArdoqClient(object):
         res = self._post('component', comp)
         return res
 
-    def get_component(self, comp_id=None):
+    def get_component(self, comp_id=None, ws_id=None):
+        if comp_id is None and ws_id is None:
+            raise ArdoqClientException('must provide a component id')
+        if comp_id is not None:
+            comp = self._get('component/' + comp_id)
+        elif ws_id is not None:
+            comp = self._get('component/', workspace=ws_id)
+        return comp
+
+    def del_component(self, comp_id=None):
         if comp_id is None:
             raise ArdoqClientException('must provide a component id')
-        comp = self._get('component/' + comp_id)
-        return comp
+        res = self._delete('component/' + comp_id)
+        return res
 
     '''
     functions for references

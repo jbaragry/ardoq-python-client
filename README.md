@@ -8,16 +8,18 @@ Ardoqpy is a thin client library for the [Ardoq](https://ardoq.com) REST API.
 (see the test client for examples)
 
 Implemented:
-- workspaces
+- workspace
     - get all
     - get by ID
     - create
     - delete
-- components
-    - get
+- component
+    - get by ID
+    - get all for workspace
     - create
-- references
-- models
+    - delete
+- reference
+- model
     - get by ID
 
 
