@@ -40,7 +40,7 @@ To get started, simply install ardoqpy, reate an ArdoqClient object and call met
     use `testclient.py`as a basis for your own client
 
 or from the console
-    from ardoq
+
     from ardoqpy.ardoqpy import ArdoqClient
     ardoq = ardoqpy.ArdoqClient(hosturl='https://app.ardoq.com', token='_your token_', org='ardoq')
     ardoq.get_workspaces()
