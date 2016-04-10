@@ -26,6 +26,7 @@ def main():
     component_id=None
     model_id='56f2b68672fa6d045996f74a'
     component_type='Application'
+    #TODO move some of these to config
 
     print('')
     print('--- getting workspaces ---')
