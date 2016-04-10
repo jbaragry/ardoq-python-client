@@ -61,14 +61,11 @@ class ArdoqClient(object):
         code = resp.status_code
 
         if code == 200 or code == 201:
-            if len(resp.json()) == 0: # is no workspaces then there is no json response
-                return {}
-            else:
-                return resp.json()
+            return resp.json()
         elif code == 204:
             return {}
         else:
-            raise ArdoqClientException({'code': code, 'errmsg': resp.reason})
+            raise ArdoqClientException({'code': code, 'reason': resp.reason, 'text': resp.text})
 
     def _get(self, resrc, **kwargs):
         url = self.baseurl + resrc
@@ -84,6 +81,14 @@ class ArdoqClient(object):
             'org': self.org
         })
         resp = self.session.post(url, json=payload, params=kwargs)
+        return self._unwrap_response(resp)
+
+    def _put(self, resrc, payload, **kwargs):
+        url = self.baseurl + resrc
+        kwargs.update({
+            'org': self.org
+        })
+        resp = self.session.put(url, json=payload, params=kwargs)
         return self._unwrap_response(resp)
 
     def _delete(self, resrc, **kwargs):
@@ -154,14 +159,27 @@ class ArdoqClient(object):
         res = self._post('component', comp)
         return res
 
-    def get_component(self, comp_id=None, ws_id=None):
-        if comp_id is None and ws_id is None:
-            raise ArdoqClientException('must provide a component id')
+    '''
+    get component
+        :param ws_id: mandatory, get component within this workspace
+        :param comp_id: id for the component to get. If None, then gets all components for that workspace
+    '''
+    def get_component(self, ws_id=None, comp_id=None):
+        if  ws_id is None:
+            raise ArdoqClientException('must provide a workspace id')
         if comp_id is not None:
+            # comp = self._get('workspace/' + ws_id + '/component/' + comp_id) this is how the upcoming API will work
             comp = self._get('component/' + comp_id)
-        elif ws_id is not None:
-            comp = self._get('component/', workspace=ws_id)
+        else:
+            comp = self._get('workspace/' + ws_id + '/component')
         return comp
+
+    def update_component(self, ws_id=None, comp_id=None, comp=None):
+        if  ws_id is None or comp_id is None or comp is None:
+            raise ArdoqClientException('must provide a workspace id, component id, and component')
+        # res = self._post('workspace/' + ws_id + '/component/' + comp_id, comp)
+        res = self._put('component/' + comp_id, comp)
+        return res
 
     def del_component(self, comp_id=None):
         if comp_id is None:

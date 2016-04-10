@@ -21,53 +21,93 @@ def main():
     get_config()
     print('read config: ', os.getcwd(), ' ', config.sections())
     ardoq = ardoqpy.ArdoqClient(hosturl=config['Ardoq']['host'], token=config['Ardoq']['token'], org=config['Ardoq']['org'])
+    workspaces=None
+    workspace=None
+    component_id=None
+    model_id='56f2b68672fa6d045996f74a'
+    component_type='Application'
 
     print('')
     print('--- getting workspaces ---')
-    workspaces = ardoq.get_workspaces()
-    # print (json.dumps(workspaces, sort_keys=True, indent=4))
-    for w in workspaces:
-        print('name: ', w['name'], ' - id: ', w['_id'])
+    try:
+        workspaces = ardoq.get_workspaces()
+        # print (json.dumps(workspaces, sort_keys=True, indent=4))
+        for w in workspaces:
+            print('name: ', w['name'], ' - id: ', w['_id'])
+    except ardoqpy.ArdoqClientException as e:
+        print (e)
 
     print('--- create a workspace of type Application Service ---')
-    new_workspace = {'description': 'workspace for python test client', 'componentModel': '56f2b68672fa6d045996f74a', 'name': 'wsPythonClient'}
-    workspace = ardoq.create_workspace(new_workspace)
-    # print (json.dumps(python_ws, sort_keys=True, indent=4))
-    print("created workspace " + workspace['_id'], ' : ', workspace['name'])
+    new_workspace = {'description': 'workspace for python test client', 'componentModel': model_id, 'name': 'wsPythonClient'}
+    try:
+        workspace = ardoq.create_workspace(new_workspace)
+        # print (json.dumps(python_ws, sort_keys=True, indent=4))
+        print("created workspace " + workspace['_id'], ' : ', workspace['name'])
+
+    except ardoqpy.ArdoqClientException as e:
+        print (e)
 
     print('')
     print('--- getting workspace by ID ---')
-    workspace = ardoq.get_workspace(ws_id=workspace['_id'])
-    print("workspace " + workspace['_id'], ' : ', workspace['name'])
+    try:
+        workspace = ardoq.get_workspace(ws_id=workspace['_id'])
+        print("workspace " + workspace['_id'], ' : ', workspace['name'])
+    except ardoqpy.ArdoqClientException as e:
+        print (e)
 
     print('')
     print('--- delete the new workspace ---')
-    del_workspace = ardoq.del_workspace(workspace['_id'])
-    print('delete: ', del_workspace)
+    try:
+        del_workspace = ardoq.del_workspace(workspace['_id'])
+        print('delete: ', del_workspace)
+    except ardoqpy.ArdoqClientException as e:
+        print (e)
 
     print('--- create another workspace of type Application Service ---')
-    new_workspace = {'description': 'workspace for python test client', 'componentModel': '56f2b68672fa6d045996f74a', 'name': 'wsPythonClient'}
-    workspace = ardoq.create_workspace(new_workspace)
-    # print (json.dumps(python_ws, sort_keys=True, indent=4))
-    print("created workspace " + workspace['_id'], ' : ', workspace['name'])
+    new_workspace = {'description': 'workspace for python test client', 'componentModel': model_id, 'name': 'wsPythonClient'}
+    try:
+        workspace = ardoq.create_workspace(new_workspace)
+        # print (json.dumps(python_ws, sort_keys=True, indent=4))
+        print("created workspace " + workspace['_id'], ' : ', workspace['name'])
+    except ardoqpy.ArdoqClientException as e:
+        print (e)
 
     print('')
     print('--- getting model and show the top level componentTypes ---')
     model = ardoq.get_model(ws_id=workspace['_id'])
     for k, v, in model["root"].items():
         print ('componentType: ', v['name'], ' : typeId ', k)
+        if v['name'] == component_type:
+            component_id = k
 
     print('')
     print('--- adding a component to a selected workspace ---')
-    component = {'description': 'some descript', 'parent': None, 'rootWorkspace': workspace['_id'], 'typeId': 'p1458752640732', 'name': 'another comp'}
-    newcomp = ardoq.create_component(component)
-    # print (json.dumps(comp, sort_keys=True, indent=4))
-    print('added comp: ', newcomp['_id'], ', with name: ', newcomp['name'])
+    component = {'description': 'some descript', 'parent': None, 'rootWorkspace': workspace['_id'], 'typeId': component_id, 'name': 'another comp'}
+    try:
+        # newcomp = ardoq.create_component(ws_id=workspace['_id'], comp=component)
+        newcomp = ardoq.create_component(comp=component)
+        # print (json.dumps(comp, sort_keys=True, indent=4))
+        print('added comp: ', newcomp['_id'], ', with name: ', newcomp['name'])
+    except ardoqpy.ArdoqClientException as e:
+        print (e)
 
     print('')
     print('--- get the newly created component---')
-    comp = ardoq.get_component(comp_id=newcomp['_id'])
-    print('got comp: ', comp['_id'], ', with name: ', comp['name'])
+    try:
+        comp = ardoq.get_component(ws_id = workspace['_id'], comp_id=newcomp['_id'])
+        print('got comp: ', comp['_id'], ', with name: ', comp['name'])
+    except ardoqpy.ArdoqClientException as e:
+        print (e)
+
+    print('')
+    print('--- update the newly created component---')
+    comp['description'] = "a totally new description"
+    try:
+        c = ardoq.update_component(ws_id=workspace['_id'], comp_id=comp['_id'], comp=comp)
+        print('got comp: ', c['_id'], ', with name: ', c['name'])
+    except ardoqpy.ArdoqClientException as e:
+        print (e)
+
 
 if __name__ == '__main__':
     main()
