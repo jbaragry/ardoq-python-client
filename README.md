@@ -18,6 +18,7 @@ Implemented:
     - get all for workspace
     - create
     - delete
+    - update
 - reference
 - model
     - get by ID
