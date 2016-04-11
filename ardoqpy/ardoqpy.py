@@ -144,8 +144,8 @@ class ArdoqClient(object):
     def get_model(self, ws_id=None):
         if ws_id is None:
             raise ArdoqClientException('must provide a workspaceID')
-        if self.workspace['_id'] != ws_id:
-            self.workspace = self._get('workspace' + '/' + ws_id)
+        #if self.workspace['_id'] != ws_id:
+        self.workspace = self._get('workspace' + '/' + ws_id)
         self.model = self._get('model' + '/' + self.workspace['componentModel'])
         return self.model
 
@@ -190,4 +190,24 @@ class ArdoqClient(object):
     '''
     functions for references
     '''
+    def create_reference(self, ref=None):
+        if ref is None:
+            raise ArdoqClientException('must provide a reference')
+        res = self._post('reference', ref)
+        return res
 
+    def get_reference(self, ws_id=None, ref_id=None):
+        if  ws_id is None:
+            raise ArdoqClientException('must provide a workspace id')
+        #if ref_id is not None:
+            # comp = self._get('workspace/' + ws_id + '/component/' + comp_id) this is how the upcoming API will work
+        if ref_id is None:
+            ref_id = ''
+        ref = self._get('reference/' + ref_id, workspace=ws_id)
+        return ref
+
+    def del_reference(self, ref_id=None):
+        if   ref_id is None:
+            raise ArdoqClientException('must provide a reference id')
+        res = self._delete('reference/' + ref_id)
+        return res

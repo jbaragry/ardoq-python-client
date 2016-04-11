@@ -20,6 +20,10 @@ Implemented:
     - delete
     - update
 - reference
+    - get all for workspace
+    - get by ID
+    - create
+    - delete
 - model
     - get by ID
 
@@ -55,3 +59,8 @@ or from the console
 ## TODO
 - complete the full REST-API for all ardoq resources
 - add support for synching that is comparable to the java-api for ardoq
+
+## License
+The ardoq-python-client is licensed under the MIT License
+
+See LICENSE.md
