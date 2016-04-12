@@ -24,6 +24,10 @@ Implemented:
     - get by ID
     - create
     - delete
+- tag
+    - get by ID
+    - get all for workspace
+    - create
 - model
     - get by ID
 

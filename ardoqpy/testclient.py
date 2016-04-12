@@ -39,7 +39,7 @@ def main():
         print (e)
 
     print('--- create a workspace of type Application Service ---')
-    new_workspace = {'description': 'workspace for python test client', 'componentModel': model_id, 'name': 'wsPythonClient'}
+    new_workspace = {'description': 'workspace for python test client', 'componentModel': model_id, 'name': 'wsPythonTestClient'}
     try:
         workspace = ardoq.create_workspace(new_workspace)
         # print (json.dumps(python_ws, sort_keys=True, indent=4))
@@ -65,7 +65,7 @@ def main():
         print (e)
 
     print('--- create another workspace of type Application Service ---')
-    new_workspace = {'description': 'workspace for python test client', 'componentModel': model_id, 'name': 'wsPythonClient'}
+    new_workspace = {'description': 'workspace for python test client', 'componentModel': model_id, 'name': 'wsPythonTestClient'}
     try:
         workspace = ardoq.create_workspace(new_workspace)
         # print (json.dumps(python_ws, sort_keys=True, indent=4))
@@ -102,6 +102,7 @@ def main():
 
     print('')
     print('--- update the newly created component---')
+    comp['name'] = 'source comp'
     comp['description'] = "a totally new description"
     try:
         c = ardoq.update_component(ws_id=workspace['_id'], comp_id=comp['_id'], comp=comp)
@@ -109,6 +110,41 @@ def main():
     except ardoqpy.ArdoqClientException as e:
         print (e)
 
+    print('')
+    print('--- adding another component to a selected workspace ---')
+    component = {'description': 'target component', 'parent': None, 'rootWorkspace': workspace['_id'], 'typeId': component_id, 'name': 'target comp'}
+    try:
+        # newcomp = ardoq.create_component(ws_id=workspace['_id'], comp=component)
+        c2 = ardoq.create_component(comp=component)
+        # print (json.dumps(comp, sort_keys=True, indent=4))
+        print('added comp: ', c2['_id'], ', with name: ', c2['name'])
+    except ardoqpy.ArdoqClientException as e:
+        print (e)
+
+    print('')
+    print('--- adding a reference to a selected workspace ---')
+    ref = {'order': 0, 'returnValue': '', 'targetWorkspace': workspace['_id'], 'target': c2['_id'], 'source': c['_id'], 'rootWorkspace': workspace['_id'], 'type': 2, 'description': 'new ref'}
+    try:
+        # newcomp = ardoq.create_component(ws_id=workspace['_id'], comp=component)
+        r = ardoq.create_reference(ref=ref)
+        # print (json.dumps(comp, sort_keys=True, indent=4))
+        print('added ref: ', r['_id'], ', with descript: ', r['description'])
+    except ardoqpy.ArdoqClientException as e:
+        print (e)
+
+    print('')
+    print('--- update the reference  ---')
+    ref['description'] = 'updated description'
+    ref['type'] = 1
+    ref['_id'] = r['_id']
+    ref['_version'] = r['_version']
+    try:
+        # newcomp = ardoq.create_component(ws_id=workspace['_id'], comp=component)
+        r = ardoq.update_reference(ref_id=r['_id'], ref=ref)
+        # print (json.dumps(comp, sort_keys=True, indent=4))
+        print('added ref: ', r['_id'], ', with descript: ', r['description'])
+    except ardoqpy.ArdoqClientException as e:
+        print (e)
 
 if __name__ == '__main__':
     main()

@@ -198,7 +198,7 @@ class ArdoqClient(object):
 
     def get_reference(self, ws_id=None, ref_id=None):
         if  ws_id is None:
-            raise ArdoqClientException('must provide a workspace id')
+            raise ArdoqClientException('must provide a source workspace id')
         #if ref_id is not None:
             # comp = self._get('workspace/' + ws_id + '/component/' + comp_id) this is how the upcoming API will work
         if ref_id is None:
@@ -211,3 +211,28 @@ class ArdoqClient(object):
             raise ArdoqClientException('must provide a reference id')
         res = self._delete('reference/' + ref_id)
         return res
+
+    def update_reference(self, ref_id=None, ref=None):
+        if ref_id is None or ref is None:
+            raise ArdoqClientException('must provide a reference id, and reference')
+        # res = self._post('workspace/' + ws_id + '/component/' + comp_id, comp)
+        res = self._put('reference/' + ref_id, ref)
+        return res
+
+    '''
+    functions for tags
+    '''
+    def create_tag(self, tag=None):
+        if tag is None:
+            raise ArdoqClientException('must provide a tag')
+        res = self._post('tag', tag)
+        return res
+
+    def get_tag(self, ws_id=None, tag_id=None):
+        if ws_id is None and tag_id is None:
+            raise ArdoqClientException('must provide a workspace id and/or tag id')
+        if tag_id is not None:
+            tag = self._get('tag/' + tag_id)
+        if ws_id is not None and tag_id is None:
+            tag = self._get('tag/' + 'workspace/' + ws_id)
+        return tag
