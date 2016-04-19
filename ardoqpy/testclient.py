@@ -38,13 +38,13 @@ def main():
     except ardoqpy.ArdoqClientException as e:
         print (e)
 
+    print('')
     print('--- create a workspace of type Application Service ---')
     new_workspace = {'description': 'workspace for python test client', 'componentModel': model_id, 'name': 'wsPythonTestClient'}
     try:
         workspace = ardoq.create_workspace(new_workspace)
         # print (json.dumps(python_ws, sort_keys=True, indent=4))
         print("created workspace " + workspace['_id'], ' : ', workspace['name'])
-
     except ardoqpy.ArdoqClientException as e:
         print (e)
 
@@ -64,14 +64,21 @@ def main():
     except ardoqpy.ArdoqClientException as e:
         print (e)
 
-    print('--- create another workspace of type Application Service ---')
-    new_workspace = {'description': 'workspace for python test client', 'componentModel': model_id, 'name': 'wsPythonTestClient'}
+    print('')
+    print('--- create another workspace of type Application Service and put it in a folder ---')
+    new_workspace = {'description': 'workspace for python test client in a folder', 'componentModel': model_id, 'name': 'wsPythonTestClientInFolder'}
     try:
+        folder = {'name':'testClientFolder', 'description': 'testfolderclient description'}
+        f = ardoq.create_folder(folder)
         workspace = ardoq.create_workspace(new_workspace)
         # print (json.dumps(python_ws, sort_keys=True, indent=4))
-        print("created workspace " + workspace['_id'], ' : ', workspace['name'])
+        print("created workspace in a folder " + workspace['_id'], ' : ', f['name'], '/', workspace['name'])
+        ws_list = []
+        ws_list.append(workspace['_id'])
+        fres = ardoq.move_workspace(folder_id = f['_id'], ws_list = ws_list)
     except ardoqpy.ArdoqClientException as e:
         print (e)
+
 
     print('')
     print('--- getting model and show the top level componentTypes ---')

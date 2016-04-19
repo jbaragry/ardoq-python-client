@@ -111,17 +111,13 @@ class ArdoqClient(object):
     # TODO need to check if the ID or name is in the existing workspaces...
     # TODO: change this to only get the workspace by ID.
     #       need a different function to find the id by name
-    def get_workspace(self, ws_id=None):
+    def get_workspace(self, ws_id=None, aggregated=False):
         if ws_id is None:
             raise ArdoqClientException("need an id for get_workspace")
-        ws_index = None
-        if self.workspaces is not None:
-            for i, v in enumerate(self.workspaces):
-                if v['_id'] == ws_id:
-                    ws_index = i
-                    self.workspace = self.workspaces[ws_index]
-        if ws_index is None or self.workspaces is None:
-            self.workspace = self._get('workspace' + '/' + ws_id)
+        endpoint = 'workspace' + '/' + ws_id
+        if aggregated:
+            endpoint += '/aggregated'
+        self.workspace = self._get(endpoint)
         return self.workspace
 
     def create_workspace(self, ws=None):
@@ -137,6 +133,18 @@ class ArdoqClient(object):
         res = self._delete('workspace/' + ws_id)
         return res
 
+    def create_folder(self, folder=None):
+        if folder is None:
+            raise ArdoqClientException('must provide a folder name and payload')
+        res = self._post('workspacefolder', folder)
+        return res
+
+    def move_workspace(self, folder_id = None, ws_list = None):
+        if ws_list is None and folder_id is None:
+            raise ArdoqClientException('must provide a folder id and list of workspaces to move')
+        res = self._put('workspacefolder/' +  folder_id + '/add', {'workspaces': ws_list})
+        return res
+
     '''
     functions for models
     '''
@@ -148,6 +156,11 @@ class ArdoqClient(object):
         self.workspace = self._get('workspace' + '/' + ws_id)
         self.model = self._get('model' + '/' + self.workspace['componentModel'])
         return self.model
+
+    def create_model(self, model=None):
+        if model is None:
+            raise ArdoqClientException('must provide a model')
+        res=self._post('model', model)
 
     '''
     functions for components

@@ -11,8 +11,11 @@ Implemented:
 - workspace
     - get all
     - get by ID
-    - create
+    - get by ID aggregated
+    - create workspace
     - delete
+    - create folder
+    - move workspace to folder
 - component
     - get by ID
     - get all for workspace
