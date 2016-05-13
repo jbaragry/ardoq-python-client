@@ -99,6 +99,9 @@ class ArdoqClient(object):
         resp = self.session.delete(url, params=kwargs)
         return self._unwrap_response(resp)
 
+    def pprint(self, obj):
+        print (json.dumps(obj, sort_keys=True, indent=4))
+
     '''
     functions for workspaces
     '''
@@ -149,12 +152,14 @@ class ArdoqClient(object):
     functions for models
     '''
     # get the model for a given workspace id
-    def get_model(self, ws_id=None):
+    def get_model(self, ws_id=None, model_id=None):
         if ws_id is None:
             raise ArdoqClientException('must provide a workspaceID')
         #if self.workspace['_id'] != ws_id:
-        self.workspace = self._get('workspace' + '/' + ws_id)
-        self.model = self._get('model' + '/' + self.workspace['componentModel'])
+        if model_id is None:
+            self.workspace = self._get('workspace' + '/' + ws_id)
+            model_id = self.workspace['componentModel']
+        self.model = self._get('model' + '/' + model_id)
         return self.model
 
     def create_model(self, model=None):
@@ -178,7 +183,7 @@ class ArdoqClient(object):
         :param comp_id: id for the component to get. If None, then gets all components for that workspace
     '''
     def get_component(self, ws_id=None, comp_id=None):
-        if  ws_id is None:
+        if  ws_id is None and comp_id is None:
             raise ArdoqClientException('must provide a workspace id')
         if comp_id is not None:
             # comp = self._get('workspace/' + ws_id + '/component/' + comp_id) this is how the upcoming API will work

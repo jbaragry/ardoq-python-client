@@ -13,7 +13,6 @@ def get_config():
     try:
         if (len(config.read(configfile)) != 1):
             raise RuntimeError("Could not read config file ", configfile)
-
     except:
         raise RuntimeError("could not get config file")
 
@@ -130,7 +129,8 @@ def main():
 
     print('')
     print('--- adding a reference to a selected workspace ---')
-    ref = {'order': 0, 'returnValue': '', 'targetWorkspace': workspace['_id'], 'target': c2['_id'], 'source': c['_id'], 'rootWorkspace': workspace['_id'], 'type': 2, 'description': 'new ref'}
+    ref = {'order': 0, 'returnValue': '', 'targetWorkspace': workspace['_id'], 'target': c2['_id'],
+           'source': c['_id'], 'rootWorkspace': workspace['_id'], 'type': 2, 'description': 'new ref'}
     try:
         # newcomp = ardoq.create_component(ws_id=workspace['_id'], comp=component)
         r = ardoq.create_reference(ref=ref)
