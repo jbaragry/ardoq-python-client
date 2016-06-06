@@ -22,6 +22,7 @@ Implemented:
     - create
     - delete
     - update
+    - find by name in workspace
 - reference
     - get all for workspace
     - get by ID

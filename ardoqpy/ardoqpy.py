@@ -183,7 +183,7 @@ class ArdoqClient(object):
         :param comp_id: id for the component to get. If None, then gets all components for that workspace
     '''
     def get_component(self, ws_id=None, comp_id=None):
-        if  ws_id is None and comp_id is None:
+        if ws_id is None and comp_id is None:
             raise ArdoqClientException('must provide a workspace id')
         if comp_id is not None:
             # comp = self._get('workspace/' + ws_id + '/component/' + comp_id) this is how the upcoming API will work
@@ -203,6 +203,12 @@ class ArdoqClient(object):
         if comp_id is None:
             raise ArdoqClientException('must provide a component id')
         res = self._delete('component/' + comp_id)
+        return res
+
+    def find_component(self, ws_id=None, comp_name=None):
+        if ws_id is None or comp_name is None:
+            raise ArdoqClientException('must provide a workspace id and comonent_name fields')
+        res= self._get('component/search', workspace=ws_id, name=comp_name)
         return res
 
     '''
