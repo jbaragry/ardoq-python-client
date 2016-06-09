@@ -23,7 +23,7 @@ def main():
     workspaces=None
     workspace=None
     component_id=None
-    model_id='56f2b68672fa6d045996f74a'
+    model_id='54d38789e4b0dcc89b8d8e13'  # application service template in the personal space
     component_type='Application'
     #TODO move some of these to config
 
@@ -37,6 +37,7 @@ def main():
     except ardoqpy.ArdoqClientException as e:
         print (e)
 
+    ''' need to wait for api changes for new models. Test client must wait until ardoq has done the changes
     print('')
     print('--- create a workspace of type Application Service ---')
     new_workspace = {'description': 'workspace for python test client', 'componentModel': model_id, 'name': 'wsPythonTestClient'}
@@ -46,6 +47,7 @@ def main():
         print("created workspace " + workspace['_id'], ' : ', workspace['name'])
     except ardoqpy.ArdoqClientException as e:
         print (e)
+
 
     print('')
     print('--- getting workspace by ID ---')
@@ -62,12 +64,14 @@ def main():
         print('delete: ', del_workspace)
     except ardoqpy.ArdoqClientException as e:
         print (e)
+    '''
 
+    model_id='5759c89572fa6d16fcc7f439'
     print('')
     print('--- create another workspace of type Application Service and put it in a folder ---')
     new_workspace = {'description': 'workspace for python test client in a folder', 'componentModel': model_id, 'name': 'wsPythonTestClientInFolder'}
     try:
-        folder = {'name':'testClientFolder', 'description': 'testfolderclient description'}
+        folder = {'name':'ardoqpyTestClientFolder', 'description': 'testfolderclient description'}
         f = ardoq.create_folder(folder)
         workspace = ardoq.create_workspace(new_workspace)
         # print (json.dumps(python_ws, sort_keys=True, indent=4))

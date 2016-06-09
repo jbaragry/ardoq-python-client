@@ -2,6 +2,8 @@
 
 import requests
 import json
+from http import cookiejar
+
 
 '''
     A simple and thin Python library for the Ardoq REST API
@@ -9,7 +11,15 @@ import json
 
     It returns JSON rather than HTTP response so that I can cache the results and add synch functionality later
     though I might change this in the future to return the full HTTP response.
+
+    written for python 3.3+
 '''
+
+
+class BlockAll(cookiejar.CookiePolicy):
+    return_ok = set_ok = domain_return_ok = path_return_ok = lambda self, *args, **kwargs: False
+    netscape = True
+    rfc2965 = hide_cookie2 = False
 
 
 class ArdoqClientException(Exception):
@@ -50,6 +60,7 @@ class ArdoqClient(object):
         self.token = token
         self.org = org
         self.session = requests.Session()
+        self.session.cookies.set_policy(BlockAll())  # for stopping cookies that mess up high-volume API calls to ardoq
         _headers = {'Authorization': 'Token token='+self.token}
         self.session.headers.update(_headers)
         self.workspaces = None
