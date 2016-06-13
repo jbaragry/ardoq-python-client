@@ -3,7 +3,10 @@
 import requests
 import json
 from http import cookiejar
+import logging
 
+logging.basicConfig(format='%(asctime)s %(message)s', level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 '''
     A simple and thin Python library for the Ardoq REST API
@@ -216,11 +219,27 @@ class ArdoqClient(object):
         res = self._delete('component/' + comp_id)
         return res
 
-    def find_component(self, ws_id=None, comp_name=None):
-        if ws_id is None or comp_name is None:
-            raise ArdoqClientException('must provide a workspace id and comonent_name fields')
-        res= self._get('component/search', workspace=ws_id, name=comp_name)
-        return res
+    def find_component(self, ws_id=None, comp_name=None, field_name=None, field_value=None, exact=False):
+        if ws_id is None:
+            raise ArdoqClientException('must provide a workspace id')
+        if comp_name is not None:
+            res= self._get('component/search', workspace=ws_id, name=comp_name)
+            if exact is True:
+                for r in res:
+                    if r['name'] == comp_name:
+                        return [].append(r)
+                return []
+            return res
+        if field_name is not None:
+            res= self._get('component/fieldsearch', workspace=ws_id, **{field_name: field_value})
+            if exact is True:
+                for r in res:
+                    if r[field_name] == field_value:
+                        return [].append(r)
+                return []
+            return res
+        raise ArdoqClientException('must provide a component name, or field name/value pair')
+
 
     '''
     functions for references
