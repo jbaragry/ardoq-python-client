@@ -227,7 +227,7 @@ class ArdoqClient(object):
             if exact is True:
                 for r in res:
                     if r['name'] == comp_name:
-                        return [].append(r)
+                        return [dict(r)]
                 return []
             return res
         if field_name is not None:
@@ -235,7 +235,7 @@ class ArdoqClient(object):
             if exact is True:
                 for r in res:
                     if r[field_name] == field_value:
-                        return [].append(r)
+                        return [dict(r)]
                 return []
             return res
         raise ArdoqClientException('must provide a component name, or field name/value pair')
