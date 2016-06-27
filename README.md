@@ -58,7 +58,7 @@ ArdoqClient Implemented:
 ArdoqClient Implemented:
 - component
     - create
-        - cache check is based on name attribute only
+        - cache check is based on name attribute only (case insensitive)
     - update
 - reference
     - create
@@ -69,11 +69,13 @@ ArdoqClient Implemented:
 
 ## Installation
 
-no `easy_install` or `pip` support
+no `pip` support
 just clone it and use it as you need to
+- if there is any interest I'll make it available with `pip`
 
 ## Dependencies
 
+- Python 3
 - [Requests](https://github.com/kennethreitz/requests) - ardoqpy uses requests package for http requests
 
 
@@ -91,11 +93,13 @@ or from the console
     ardoq = ardoqpy.ArdoqClient(hosturl='https://app.ardoq.com', token='_your token_', org='ardoq')
     ardoq.get_workspaces()
 
-## Version
+## Changelog
 
-- 0.1 - 2016/04/02  - Initial dev
-- 0.2 - 2016/06/18  - bug and feature improvements
-                    - first version of the sync client
+- 2016/04/02
+    - Initial dev
+- 2016/06/18
+    - bug and feature improvements
+    - first version of the sync client
 
 ## TODO
 - complete the full REST-API for fields and tags
