@@ -79,6 +79,7 @@ class ArdoqClient(object):
         elif code == 204:
             return {}
         else:
+            logging.debug('request: %s', resp.request.body)
             raise ArdoqClientException({'code': code, 'reason': resp.reason, 'text': resp.text})
 
     def _get(self, resrc, **kwargs):
@@ -206,10 +207,9 @@ class ArdoqClient(object):
             comp = self._get('workspace/' + ws_id + '/component')
         return comp
 
-    def update_component(self, ws_id=None, comp_id=None, comp=None):
-        if  ws_id is None or comp_id is None or comp is None:
-            raise ArdoqClientException('must provide a workspace id, component id, and component')
-        # res = self._post('workspace/' + ws_id + '/component/' + comp_id, comp)
+    def update_component(self, comp_id=None, comp=None):
+        if comp_id is None or comp is None:
+            raise ArdoqClientException('must provide a component id, and component')
         res = self._put('component/' + comp_id, comp)
         return res
 
@@ -251,7 +251,7 @@ class ArdoqClient(object):
         return res
 
     def get_reference(self, ws_id=None, ref_id=None):
-        if  ws_id is None:
+        if ws_id is None:
             raise ArdoqClientException('must provide a source workspace id')
         #if ref_id is not None:
             # comp = self._get('workspace/' + ws_id + '/component/' + comp_id) this is how the upcoming API will work
@@ -261,7 +261,7 @@ class ArdoqClient(object):
         return ref
 
     def del_reference(self, ref_id=None):
-        if   ref_id is None:
+        if ref_id is None:
             raise ArdoqClientException('must provide a reference id')
         res = self._delete('reference/' + ref_id)
         return res
@@ -269,7 +269,6 @@ class ArdoqClient(object):
     def update_reference(self, ref_id=None, ref=None):
         if ref_id is None or ref is None:
             raise ArdoqClientException('must provide a reference id, and reference')
-        # res = self._post('workspace/' + ws_id + '/component/' + comp_id, comp)
         res = self._put('reference/' + ref_id, ref)
         return res
 

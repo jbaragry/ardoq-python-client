@@ -1,13 +1,30 @@
-# Ardoqpy - a Python client for The Ardoq REST API
+# Ardoqpy - a Python3 client for The Ardoq REST API
 
 ## Description
 
 Ardoqpy is a thin client library for the [Ardoq](https://ardoq.com) REST API.
+It consists of 2 clients
+    - ArdoqClient
+        - thin client for the rest-api
+    - ArdoqSyncClient
+        - subclass of ArdoqClient
+        - maintains a cache of aggregated workspace information
+        - overrides write operations
+            - only create components and references if they are not already in the cache
+            - update cache for create and update operations
+            - cache hit is based on
+                - component: name, typeId
+                    - NB: name match is CASE_INSENSITIVE
+                - reference: source, target, and type
+        - overriders find_component (comp_name)
+            - loads aggregated workspace to cache if its not present
+            - finds component based on name (use at own risk)
+        
 
 ## Documentation
 (see the test client for examples)
 
-Implemented:
+ArdoqClient Implemented:
 - workspace
     - get all
     - get by ID
@@ -23,10 +40,12 @@ Implemented:
     - delete
     - update
     - find by name in workspace
+    - find by field_name / field_value in workspace
 - reference
     - get all for workspace
     - get by ID
     - create
+    - update
     - delete
 - tag
     - get by ID
@@ -34,6 +53,18 @@ Implemented:
     - create
 - model
     - get by ID
+
+
+ArdoqClient Implemented:
+- component
+    - create
+        - cache check is based on name attribute only
+    - update
+- reference
+    - create
+        - cache check is based on source, target, and type attributes
+    - update
+
 
 
 ## Installation
@@ -62,11 +93,12 @@ or from the console
 
 ## Version
 
-- 0.1 - 2016/04/02 - Initial dev
+- 0.1 - 2016/04/02  - Initial dev
+- 0.2 - 2016/06/18  - bug and feature improvements
+                    - first version of the sync client
 
 ## TODO
-- complete the full REST-API for all ardoq resources
-- add support for synching that is comparable to the java-api for ardoq
+- complete the full REST-API for fields and tags
 
 ## License
 The ardoq-python-client is licensed under the MIT License

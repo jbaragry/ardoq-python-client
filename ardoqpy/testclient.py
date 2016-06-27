@@ -115,7 +115,7 @@ def main():
     comp['name'] = 'source comp'
     comp['description'] = "a totally new description"
     try:
-        c = ardoq.update_component(ws_id=workspace['_id'], comp_id=comp['_id'], comp=comp)
+        c = ardoq.update_component(comp_id=comp['_id'], comp=comp)
         print('got comp: ', c['_id'], ', with name: ', c['name'])
     except ardoqpy.ArdoqClientException as e:
         print (e)
