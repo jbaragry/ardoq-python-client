@@ -4,21 +4,21 @@
 
 Ardoqpy is a thin client library for the [Ardoq](https://ardoq.com) REST API.
 It consists of 2 clients
-    - ArdoqClient
-        - thin client for the rest-api
-    - ArdoqSyncClient
-        - subclass of ArdoqClient
-        - maintains a cache of aggregated workspace information
-        - overrides write operations
-            - only create components and references if they are not already in the cache
-            - update cache for create and update operations
-            - cache hit is based on
-                - component: name, typeId
-                    - NB: name match is CASE_INSENSITIVE
-                - reference: source, target, and type
-        - overriders find_component (comp_name)
-            - loads aggregated workspace to cache if its not present
-            - finds component based on name (use at own risk)
+- ArdoqClient
+    - thin client for the rest-api
+- ArdoqSyncClient
+    - subclass of ArdoqClient
+    - maintains a cache of aggregated workspace information
+    - overrides write operations
+        - only create components and references if they are not already in the cache
+        - update cache for create and update operations
+        - cache hit is based on
+            - component: name, typeId
+                - NB: name match is CASE_INSENSITIVE
+            - reference: source, target, and type
+    - overriders find_component (comp_name)
+        - loads aggregated workspace to cache if its not present
+        - finds component based on name (use at own risk)
         
 
 ## Documentation
