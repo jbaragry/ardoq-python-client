@@ -54,6 +54,9 @@ ArdoqClient Implemented:
     - create
 - model
     - get by ID
+- util
+    - pprint
+        - pretty print responses from ardoq calls
 
 
 ArdoqSyncClient Implemented:
