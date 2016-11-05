@@ -27,6 +27,7 @@ It consists of 2 clients
 ArdoqClient Implemented:
 - workspace
     - get all
+        - summary=True is undocumented in the REST docs but returns stats for workspaces
     - get by ID
     - get by ID aggregated
     - create workspace
@@ -55,7 +56,8 @@ ArdoqClient Implemented:
     - get by ID
 
 
-ArdoqClient Implemented:
+ArdoqSyncClient Implemented:
+- all interfaces from ArdoqClient
 - component
     - create
         - cache check is based on name attribute only (case insensitive)

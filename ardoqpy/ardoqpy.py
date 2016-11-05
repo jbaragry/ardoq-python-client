@@ -121,8 +121,8 @@ class ArdoqClient(object):
     functions for workspaces
     '''
     # get all workspaces
-    def get_workspaces(self):
-        self.workspaces = self._get('workspace')
+    def get_workspaces(self, summary=False):
+        self.workspaces = self._get('workspace' if not summary else 'workspace/summary')
         return self.workspaces
 
     # gets the workspace using either the workspace ID or name
