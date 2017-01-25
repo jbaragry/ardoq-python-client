@@ -182,6 +182,11 @@ class ArdoqClient(object):
             raise ArdoqClientException('must provide a model')
         res=self._post('model', model)
 
+    def create_field(self, field=None):
+        if field is None:
+            raise ArdoqClientException('must provide a field')
+        res=self._post('field', field)
+
     '''
     functions for components
     '''
