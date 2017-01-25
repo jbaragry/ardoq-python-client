@@ -19,10 +19,15 @@ It consists of 2 clients
     - overriders find_component (comp_name)
         - loads aggregated workspace to cache if its not present
         - finds component based on name (use at own risk)
-        
+
 
 ## Documentation
 (see the test client for examples)
+
+### Import Usage
+```
+from ardoqpy.ardoqpy import ArdoqClient
+```
 
 ArdoqClient Implemented:
 - workspace
@@ -74,9 +79,9 @@ ArdoqSyncClient Implemented:
 
 ## Installation
 
-no `pip` support
-just clone it and use it as you need to
-- if there is any interest I'll make it available with `pip`
+```
+pip install ardoqpy
+```
 
 ## Dependencies
 
@@ -85,9 +90,8 @@ just clone it and use it as you need to
 
 
 ## Quick Start
-To get started, simply install ardoqpy, reate an ArdoqClient object and call methods:
+To get started, simply install ardoqpy, create an ArdoqClient object and call methods:
 
-    clone the repo
     edit `ardoq.cfg` to include your API token
     make sure `ardoqpy.py` opens your `ardoq.cfg`configuration file
     use `testclient.py`as a basis for your own client
@@ -99,6 +103,8 @@ or from the console
     ardoq.get_workspaces()
 
 ## Changelog
+- 2017/01/25
+    - Added pip and fields creation support.
 
 - 2016/04/02
     - Initial dev
