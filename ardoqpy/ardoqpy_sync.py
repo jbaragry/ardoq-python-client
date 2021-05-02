@@ -9,7 +9,7 @@ class ArdoqSyncClient(ArdoqClient):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.ws = {}
+        self.ws = {} # cache is a dictionary of workspaces. wsID is the key for each
         self.init_report()
 
     def get_workspace(self, *args, **kwargs):
@@ -135,4 +135,5 @@ class ArdoqSyncClient(ArdoqClient):
     def init_report(self):
         self.report = {'new_comps': 0, 'updated_comps': 0,
                        'new_refs': 0, 'updated_refs': 0,
-                       'cache_hit_comps': 0, 'cache_hit_refs': 0}
+                       'cache_hit_comps': 0, 'cache_hit_refs': 0,
+                       'status': 'success', 'description': None}
