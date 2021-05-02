@@ -19,6 +19,8 @@ class ArdoqSyncClient(ArdoqClient):
 
     def _is_different(self, old, new):
         for k, v in new.items():
+            if k not in old.keys(): # might be a new attribute
+                return True
             if new[k] != old[k]:
                 return True
         return False
@@ -29,12 +31,20 @@ class ArdoqSyncClient(ArdoqClient):
                 return ind, c
         return 0, {}
 
-    def find_component(self, ws_id=None, comp_name=None, field_name=None, field_value=None, exact=False):
-        if ws_id != None and comp_name != None:
+    # find component in cache
+    # find is based on component name in ws.
+    # name comparison is substring. can be set to exact match with exact param
+    def find_component(self, ws_id=None, comp_name=None,
+                       field_name=None, field_value=None, exact=False):
+        if ws_id != None and (comp_name != None or field_name != None):
             if ws_id not in self.ws.keys():
                 self.ws[ws_id] = self.get_workspace(ws_id=ws_id)
             comps = list()
             for ind, c in enumerate(self.ws[ws_id]['components']):
+                if field_name is not None:
+                    if c['field_name'] == field_value:
+                        comps.append(c)
+                        break
                 if exact:
                     if comp_name == c['name']:
                         logging.debug('find_component - cache_hit: %s', comp_name)
