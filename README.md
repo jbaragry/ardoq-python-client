@@ -18,8 +18,10 @@ It consists of 2 clients
             - reference: source, target, and type
     - overriders find_component (comp_name)
         - loads aggregated workspace to cache if its not present
-        - finds component based on name (use at own risk)
-
+        - finds component based on either of the following 
+            - name: substring or exact match
+            - fieldname == fieldvalue (you need to ensure the types can handle equivalence)
+                - fieldname, if not None, is checked first
 
 ## Documentation
 (see the test client for examples)
