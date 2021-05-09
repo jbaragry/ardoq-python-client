@@ -18,7 +18,7 @@ with open(path.join(here, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name='ardoqpy',
-    version='0.0.1',
+    version='0.8.0',
     description='A small REST API wratter in python for Ardoq - https://ardoq.com.',
     long_description=long_description,
     url='https://github.com/jbaragry/ardoq-python-client',
@@ -42,8 +42,13 @@ setup(
         'Programming Language :: Python :: 3.2',
         'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9'
     ],
 
     keywords='architecture ardoq REST API wrapper tool',
-    install_requires=['cookiejar', 'configparser', 'Requests'],
+    install_requires=['cookiejar', 'configparser', 'requests'],
 )
