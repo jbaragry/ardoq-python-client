@@ -138,9 +138,9 @@ class ArdoqSyncClient(ArdoqClient):
         self.report['updated_refs'] += 1
 
     def get_report(self):
-        print('Ardoq Sync')
+        logging.info('Ardoq Sync')
         for k, v in self.report.items():
-            print(k, ' : ', v)
+            logging.info(k, ' : ', v)
 
     def init_report(self):
         self.report = {'new_comps': 0, 'updated_comps': 0,
