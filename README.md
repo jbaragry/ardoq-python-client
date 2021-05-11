@@ -28,7 +28,7 @@ It consists of 2 clients
 
 ### Import Usage
 ```
-from ardoqpy.ardoqpy import ArdoqClient
+from ardoqpy import ArdoqClient
 ```
 
 ArdoqClient Implemented:
@@ -100,7 +100,7 @@ To get started, simply install ardoqpy, create an ArdoqClient object and call me
 
 or from the console
 
-    from ardoqpy.ardoqpy import ArdoqClient
+    from ardoqpy import ArdoqClient
     ardoq = ardoqpy.ArdoqClient(hosturl='https://app.ardoq.com', token='_your token_', org='ardoq')
     ardoq.get_workspaces()
 

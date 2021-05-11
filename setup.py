@@ -4,34 +4,31 @@ https://packaging.python.org/en/latest/distributing.html
 https://github.com/pypa/sampleproject
 """
 
-# Always prefer setuptools over distutils
-from setuptools import setup, find_packages
-# To use a consistent encoding
-from codecs import open
-from os import path
+try:
+    from setuptools import setup
+except ImportError:
+    from distutils.core import setup
 
-here = path.abspath(path.dirname(__file__))
-
-# Get the long description from the README file
-with open(path.join(here, 'README.md'), encoding='utf-8') as f:
-    long_description = f.read()
+with open("README.md", "r") as fh:
+    long_description = fh.read()
 
 setup(
     name='ardoqpy',
-    version='0.8.0',
+    version='0.6.2',
     description='A small REST API wratter in python for Ardoq - https://ardoq.com.',
     long_description=long_description,
+    long_description_content_type="text/markdown",
     url='https://github.com/jbaragry/ardoq-python-client',
     author='Jason Baragry',
+    author_email='jason.baragry@gmail.com',
     license='MIT',
-    packages=find_packages('ardoqpy'),
-    package_dir={'': 'ardoqpy'},
+    packages=['ardoqpy'],
     data_files=[('ardoqpy.cfg', ['ardoqpy/ardoqpy.cfg'])],
     classifiers=[
         'Development Status :: 3 - Alpha',
     # Indicate who your project is intended for
         'Intended Audience :: Developers',
-        'Topic :: Software Development :: Architecture',
+        'Topic :: Software Development :: Documentation',
 
         # Pick your license as you wish (should match "license" above)
          'License :: OSI Approved :: MIT License',
