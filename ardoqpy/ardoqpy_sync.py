@@ -1,16 +1,30 @@
 import logging
+import secrets
 from ardoqpy import ArdoqClient
 
 logging.basicConfig(format='%(asctime)s %(message)s', level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
+'''
+ArdoqSyncClient is a subclass of ArdoqClient
+It provides the same functions as the superclass but maintains a cache of ardoq model information
+Read return from the cache if it exists
+Write operations update ardoq only if the item is missing from the cache or if new attributes are different from those in the cache
+
+Has one additional operation keyword argument - simulate
+If simulate is True then write operations update the report but are not performed in ardoq and the cache is not updated
+return value from these operations will be the same as the input param
+
+ardoq = ArdoqSyncClient(hosturl='https://myorg.ardoq.com', token='....', simulate=True)
+'''
 
 class ArdoqSyncClient(ArdoqClient):
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, simulate=False, **kwargs):
         super().__init__(*args, **kwargs)
         self.ws = {} # cache is a dictionary of workspaces. wsID is the key for each
         self.init_report()
+        self.simulate = simulate
 
     def get_workspace(self, *args, **kwargs):
         res = super().get_workspace(*args, **kwargs, aggregated=True)
@@ -71,30 +85,53 @@ class ArdoqSyncClient(ArdoqClient):
             if self._is_different(c, comp):
                 for k, v in comp.items():
                     c[k] = comp[k]
-                res = super().update_component(comp_id=c['_id'], comp=c)
-                self.ws[comp['rootWorkspace']]['components'][ind] = res
-                self.report['updated_comps'] += 1
-                return(res)
+                if not self.simulate:
+                    res = super().update_component(comp_id=c['_id'], comp=c)
+                    self.ws[comp['rootWorkspace']]['components'][ind] = res
+                    self.report['updated_comps'] += 1
+                    return(res)
+                else:
+                    self.report['updated_comps'] += 1
+                    return (c)
             else:
                 logging.debug('create_component - cache_hit: %s', comp['name'])
                 self.report['cache_hit_comps'] += 1
                 return c
-        res = super().create_component(comp=comp)
-        self.ws[comp['rootWorkspace']]['components'].append(res)
-        self.report['new_comps'] += 1
-        return res
+        if not self.simulate:
+            res = super().create_component(comp=comp)
+            self.ws[comp['rootWorkspace']]['components'].append(res)
+            self.report['new_comps'] += 1
+            self.report['new_comps_l'].append({'_id': res['_id'], 'name': res['name'], 'type': res['type']})
+            return res
+        else:
+            self.report['new_comps'] += 1
+            comp['_id'] = secrets.token_hex(15) # make a fake _id if when simulating
+            self.report['new_comps_l'].append({'_id': comp['_id'], 'name': comp['name'], 'type': comp['typeId']})
+            return(comp)
 
     def update_component(self, comp_id=None, comp=None):
         if comp['rootWorkspace'] not in self.ws.keys():
             self.ws[comp['rootWorkspace']] = self.get_workspace(ws_id=comp['rootWorkspace'])
+        if not self.simulate:
+            res = super().update_component(comp_id=comp_id, comp=comp)
+            ind = next(index for index, c in
+                       enumerate(self.ws[comp['rootWorkspace']]['components'])
+                       if c['_id'] == comp['_id'])
+            self.ws[comp['rootWorkspace']]['components'][ind] = res
+            self.report['updated_comps'] += 1
+            return res
+        else:
+            self.report['updated_comps'] += 1
+            return comp
 
-        res = super().update_component(comp_id=comp_id, comp=comp)
-
-        ind = next(index for index, c in
-                   enumerate(self.ws[comp['rootWorkspace']]['components'])
-                   if c['_id'] == comp['_id'])
-        self.ws[comp['rootWorkspace']]['components'][ind] = res
-        self.report['updated_comps'] += 1
+    def del_component(self, comp_id=None):
+        if not self.simulate:
+            res = super().del_component(comp_id=comp_id)
+            self.report['del_comps'] += 1
+            return res
+        else:
+            self.report['del_comps'] += 1
+            return comp_id
 
     def _find_reference(self, ref=None):
         for ind, r in enumerate(self.ws[ref['rootWorkspace']]['references']):
@@ -113,37 +150,63 @@ class ArdoqSyncClient(ArdoqClient):
             if self._is_different(r, ref):
                 for k, v in ref.items():
                     r[k] = ref[k]
-                res = super().update_reference(ref_id=r['_id'], ref=r)
-                self.ws[ref['rootWorkspace']]['references'][ind] = res
-                self.report['updated_refs'] += 1
-                return(res)
+                if not self.simulate:
+                    res = super().update_reference(ref_id=r['_id'], ref=r)
+                    self.ws[ref['rootWorkspace']]['references'][ind] = res
+                    self.report['updated_refs'] += 1
+                    return(res)
+                else:
+                    self.report['updated_refs'] += 1
+                    return ref
             else:
                 logging.debug('create_ref - cache_hit: %s', ref['displayText'])
                 self.report['cache_hit_refs'] += 1
                 return r
-        res = super().create_reference(ref=ref)
-        self.ws[ref['rootWorkspace']]['references'].append(res)
-        self.report['new_refs'] += 1
-        return res
+        if not self.simulate:
+            res = super().create_reference(ref=ref)
+            self.ws[ref['rootWorkspace']]['references'].append(res)
+            self.report['new_refs'] += 1
+            return res
+        else:
+            self.report['new_refs'] += 1
+            ref['_id'] = secrets.token_hex(15)  # make a fake _id if when simulating
+            return ref
 
     def update_reference(self, ref_id=None, ref=None):
         if ref['rootWorkspace'] not in self.ws.keys():
             self.ws[ref['rootWorkspace']] = self.get_workspace(ws_id=ref['rootWorkspace'])
+        if not self.simulate:
+            res = super().update_reference(ref_id=ref_id, ref=ref)
+            ind = next(index for index, r in
+                       enumerate(self.ws[ref['rootWorkspace']]['references'])
+                       if r['_id'] == ref['_id'])
+            self.ws[ref['rootWorkspace']]['references'][ind] = res
+            self.report['updated_refs'] += 1
+            return res
+        else:
+            self.report['updated_refs'] += 1
+            return ref
 
-        res = super().update_reference(ref_id=ref_id, ref=ref)
-        ind = next(index for index, r in
-                   enumerate(self.ws[ref['rootWorkspace']]['references'])
-                   if r['_id'] == ref['_id'])
-        self.ws[ref['rootWorkspace']]['references'][ind] = res
-        self.report['updated_refs'] += 1
+    def del_reference(self, ref_id=None):
+        if not self.simulate:
+            res = super().del_reference(ref_id=ref_id)
+            self.report['del_refs'] += 1
+            return res
+        else:
+            self.report['del_refs'] += 1
+            return ref_id
 
     def get_report(self):
         logging.info('Ardoq Sync')
         for k, v in self.report.items():
-            logging.info(k, ' : ', v)
+            logging.info(f'{k} : {v}')
+        return self.report
 
     def init_report(self):
-        self.report = {'new_comps': 0, 'updated_comps': 0,
-                       'new_refs': 0, 'updated_refs': 0,
+        # TODO: can remove the number keys that also have lists. Original dict didn't have the list vals
+        self.report = {'new_comps': 0, 'new_comps_l': [], 'updated_comps': 0, 'del_comps': 0,
+                       'new_refs': 0, 'updated_refs': 0, 'del_refs': 0,
                        'cache_hit_comps': 0, 'cache_hit_refs': 0,
+                       'cache_miss_comps': [], # list of components
+                       'cache_miss_refs': [], # list of refs
                        'status': 'success', 'description': None}

@@ -22,11 +22,12 @@ It consists of 2 clients
             - name: substring or exact match
             - fieldname == fieldvalue (you need to ensure the types can handle equivalence)
                 - fieldname, if not None, is checked first
+    - can be run in simulate mode which updates the report but does not execute write operations in ardoq
 
 ## Documentation
 (see the test client for examples)
 
-### Import Usage
+### ArdoqClient Import Usage
 ```
 from ardoqpy import ArdoqClient
 ```
@@ -65,6 +66,12 @@ ArdoqClient Implemented:
     - pprint
         - pretty print responses from ardoq calls
 
+### ArdoqSyncClient Import Usage
+```
+from ardoqpy_sync import ArdoqSyncClient
+ardoq = ArdoqSyncClient(hosturl=host, token=token)
+ardoqsim = ArdoqSyncClient(hosturl=host, token=token, simulate=True)
+```
 
 ArdoqSyncClient Implemented:
 - all interfaces from ArdoqClient
@@ -76,7 +83,6 @@ ArdoqSyncClient Implemented:
     - create
         - cache check is based on source, target, and type attributes
     - update
-
 
 
 ## Installation
@@ -105,14 +111,22 @@ or from the console
     ardoq.get_workspaces()
 
 ## Changelog
-- 2017/01/25
-    - Added pip and fields creation support.
+- 20210717
+    - Added simulate option to SyncClient to simulate write operations to update the report without modifying ardoq
 
-- 2016/04/02
-    - Initial dev
-- 2016/06/18
+- 20210420
+    - Fixed PyPy support
+
+- 20170125
+    - Added pip and fields creation support.
+    
+- 20160618
     - bug and feature improvements
     - first version of the sync client
+
+- 20160402
+    - Initial dev
+    
 
 ## TODO
 - complete the full REST-API for fields and tags
