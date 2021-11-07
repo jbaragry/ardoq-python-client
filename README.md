@@ -111,6 +111,10 @@ or from the console
     ardoq.get_workspaces()
 
 ## Changelog
+- 20211107
+  - improve simulation mode
+  - added cache_miss_comps and cache_miss_refs lists to capture items found in ardoq that are no longer in the source systems
+
 - 20210717
     - Added simulate option to SyncClient to simulate write operations to update the report without modifying ardoq
 
