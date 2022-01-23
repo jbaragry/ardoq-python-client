@@ -14,8 +14,8 @@ with open("README.md", "r") as fh:
 
 setup(
     name='ardoqpy',
-    version='0.6.2',
-    description='A small REST API wratter in python for Ardoq - https://ardoq.com.',
+    version='0.7.0',
+    description='A python REST API wrapper for Ardoq - https://ardoq.com.',
     long_description=long_description,
     long_description_content_type="text/markdown",
     url='https://github.com/jbaragry/ardoq-python-client',
