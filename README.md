@@ -111,6 +111,9 @@ or from the console
     ardoq.get_workspaces()
 
 ## Changelog
+- 20220122
+  - changed get_model. calling without ws_id now returns all models 
+
 - 20211107
   - improve simulation mode
   - added cache_miss_comps and cache_miss_refs lists to capture items found in ardoq that are no longer in the source systems
@@ -123,7 +126,7 @@ or from the console
 
 - 20170125
     - Added pip and fields creation support.
-    
+
 - 20160618
     - bug and feature improvements
     - first version of the sync client

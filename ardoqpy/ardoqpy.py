@@ -170,12 +170,18 @@ class ArdoqClient(object):
     def get_model(self, ws_id=None, model_id=None):
         if ws_id is None:
             raise ArdoqClientException('must provide a workspaceID')
-        #if self.workspace['_id'] != ws_id:
+        # if self.workspace['_id'] != ws_id:
         if model_id is None:
             self.workspace = self._get('workspace' + '/' + ws_id)
             model_id = self.workspace['componentModel']
         self.model = self._get('model' + '/' + model_id)
         return self.model
+
+    # get all model for and organisation
+    # TODO combine with get_model
+    def get_models(self):
+        self.models = self._get('model' + '/')
+        return self.models
 
     def create_model(self, model=None):
         if model is None:
