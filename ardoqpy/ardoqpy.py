@@ -157,6 +157,10 @@ class ArdoqClient(object):
         res = self._post('workspacefolder', folder)
         return res
 
+    def get_folder(self, folder_id=None):
+        res = self._get('workspacefolder/' + folder_id)
+        return res
+
     def move_workspace(self, folder_id = None, ws_list = None):
         if ws_list is None and folder_id is None:
             raise ArdoqClientException('must provide a folder id and list of workspaces to move')

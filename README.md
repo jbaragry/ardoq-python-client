@@ -62,6 +62,10 @@ ArdoqClient Implemented:
     - create
 - model
     - get by ID
+    - get all models and templates
+- folder
+  - create
+  - get by ID and all folders
 - util
     - pprint
         - pretty print responses from ardoq calls
@@ -113,6 +117,7 @@ or from the console
 ## Changelog
 - 20220122
   - changed get_model. calling without ws_id now returns all models 
+  - added get_folder. returns all folders if no folder_id
 
 - 20211107
   - improve simulation mode
