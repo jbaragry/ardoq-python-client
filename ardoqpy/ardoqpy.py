@@ -212,14 +212,15 @@ class ArdoqClient(object):
         :param ws_id: mandatory, get component within this workspace
         :param comp_id: id for the component to get. If None, then gets all components for that workspace
     '''
-    def get_component(self, ws_id=None, comp_id=None):
+    def get_component(self, ws_id=None, comp_id=None, incl_refs=False):
+        params = {'includeReferences': str(incl_refs).lower()}
         if ws_id is None and comp_id is None:
             raise ArdoqClientException('must provide a workspace id')
         if comp_id is not None:
             # comp = self._get('workspace/' + ws_id + '/component/' + comp_id) this is how the upcoming API will work
-            comp = self._get('component/' + comp_id)
+            comp = self._get('component/' + comp_id, params)
         else:
-            comp = self._get('workspace/' + ws_id + '/component')
+            comp = self._get('workspace/' + ws_id + '/component', params)
         return comp
 
     def update_component(self, comp_id=None, comp=None):
