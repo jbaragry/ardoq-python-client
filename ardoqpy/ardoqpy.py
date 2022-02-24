@@ -213,23 +213,25 @@ class ArdoqClient(object):
         res = self._post('component', comp)
         return res
 
-    def get_component(self, ws_id=None, comp_id=None):
+    def get_component(self, ws_id=None, comp_id=None, incl_refs=False):
         """
         :param self:
         :param ws_id: mandatory, get component within this workspace
         :param comp_id: id for the component to get. If None, then gets all components for that workspace
+        :param incl_refs: an optional boolean, wether the components references should be fetched
         :return: component created in ardoq
         """
+        params = {'includeReferences': str(incl_refs).lower()}
         if ws_id is None and comp_id is None:
             raise ArdoqClientException('must provide a workspace id')
         if comp_id is not None:
             # comp = self._get('workspace/' + ws_id + '/component/' + comp_id) this is how the upcoming API will work
-            comp = self._get('component/' + comp_id)
+            comp = self._get('component/' + comp_id, params)
         else:
             # changed get all components to use the search function rather than workspace url
             # this is according to the public API. using the workspace was the old API
             # comp = self._get('workspace/' + ws_id + '/component')
-            comp = self._get('component/search', workspace=ws_id)
+            comp = self._get('component/search', workspace=ws_id, kwargs=params)
         return comp
 
     def update_component(self, comp_id=None, comp=None):
