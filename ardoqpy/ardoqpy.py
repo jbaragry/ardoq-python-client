@@ -50,17 +50,21 @@ class ArdoqClient(object):
         Example usage::
             ...
     '''
-    def __init__(self, hosturl='https://app.ardoq.com/', token=None, org='ardoq'):
+    def __init__(self, hosturl=None, token=None, org=None):
         '''
         Create an Ardoq API client.
-        :param hosturl: The Ardoq installation you wish to connect to (defaults to https://app.ardoq.com)
+        :param hosturl: The Ardoq installation you wish to connect to (default removed. Must have org url)
         :param token: An authorization token
         :param org:
-            organization to use. Defaults to personal org
+            organization to use. This is now deprecated. But kept for backwards compatibility
         '''
 
+        if hosturl[-1] == '/':
+            hosturl = hosturl[:-1]
         self.baseurl = hosturl + '/api/'
         self.token = token
+        if org:
+            logging.warning("org parameter is now DEPRECATED. It should be specified in the URL")
         self.org = org
         self.session = requests.Session()
         self.session.cookies.set_policy(BlockAll())  # for stopping cookies that mess up high-volume API calls to ardoq
@@ -197,29 +201,35 @@ class ArdoqClient(object):
             raise ArdoqClientException('must provide a field')
         res=self._post('field', field)
 
-    '''
-    functions for components
-    '''
-    # post a new component
+
     def create_component(self, comp=None):
+        """
+        # post a new component
+        :param comp:
+        :return:
+        """
         if comp is None:
             raise ArdoqClientException('must provide a component')
         res = self._post('component', comp)
         return res
 
-    '''
-    get component
+    def get_component(self, ws_id=None, comp_id=None):
+        """
+        :param self:
         :param ws_id: mandatory, get component within this workspace
         :param comp_id: id for the component to get. If None, then gets all components for that workspace
-    '''
-    def get_component(self, ws_id=None, comp_id=None):
+        :return: component created in ardoq
+        """
         if ws_id is None and comp_id is None:
             raise ArdoqClientException('must provide a workspace id')
         if comp_id is not None:
             # comp = self._get('workspace/' + ws_id + '/component/' + comp_id) this is how the upcoming API will work
             comp = self._get('component/' + comp_id)
         else:
-            comp = self._get('workspace/' + ws_id + '/component')
+            # changed get all components to use the search function rather than workspace url
+            # this is according to the public API. using the workspace was the old API
+            # comp = self._get('workspace/' + ws_id + '/component')
+            comp = self._get('component/search', workspace=ws_id)
         return comp
 
     def update_component(self, comp_id=None, comp=None):

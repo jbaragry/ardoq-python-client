@@ -134,6 +134,8 @@ class ArdoqSyncClient(ArdoqClient):
             return comp_id
 
     def _find_reference(self, ref=None):
+        if not self.ws[ref['rootWorkspace']]['references']:
+            return 0, {}
         for ind, r in enumerate(self.ws[ref['rootWorkspace']]['references']):
             if r['type'] == ref['type'] and r['target'] == ref['target'] and r['source'] == ref['source']:
                 return ind, r
@@ -164,6 +166,8 @@ class ArdoqSyncClient(ArdoqClient):
                 return r
         if not self.simulate:
             res = super().create_reference(ref=ref)
+            if not self.ws[ref['rootWorkspace']]['references']:
+                self.ws[ref['rootWorkspace']]['references'] = []
             self.ws[ref['rootWorkspace']]['references'].append(res)
             self.report['new_refs'] += 1
             return res

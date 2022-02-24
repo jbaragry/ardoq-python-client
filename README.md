@@ -111,10 +111,18 @@ To get started, simply install ardoqpy, create an ArdoqClient object and call me
 or from the console
 
     from ardoqpy import ArdoqClient
-    ardoq = ardoqpy.ArdoqClient(hosturl='https://app.ardoq.com', token='_your token_', org='ardoq')
+    ardoq = ardoqpy.ArdoqClient(hosturl='https://YOURORG.ardoq.com', token='YOURTOKEN')
     ardoq.get_workspaces()
 
 ## Changelog
+- 20220212
+  - deprecated org parameter
+  - removed problem with slash on url
+  - change get all components in ws to search operation. In line with public API docs
+
+- 20220131
+  - fixed bug in SyncClient when searching for references in a WS without refs
+
 - 20220122
   - changed get_model. calling without ws_id now returns all models 
   - added get_folder. returns all folders if no folder_id
