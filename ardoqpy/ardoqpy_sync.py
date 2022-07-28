@@ -18,6 +18,7 @@ return value from these operations will be the same as the input param
 ardoq = ArdoqSyncClient(hosturl='https://myorg.ardoq.com', token='....', simulate=True)
 '''
 
+
 class ArdoqSyncClient(ArdoqClient):
 
     def __init__(self, *args, simulate=False, **kwargs):
@@ -75,11 +76,21 @@ class ArdoqSyncClient(ArdoqClient):
             return res
 
     def create_component(self, comp=None):
-        # search in cache
-        # if its different then update cache and ardoq
+        '''
+        will create a new component
+        if component already exists then it will update instead
+        find function is based on comp_name only
+        :param comp:
+        :return:
+        '''
+        # search in cache based on name
+        # if its different, then update cache and ardoq
         if comp['rootWorkspace'] not in self.ws.keys():
             self.ws[comp['rootWorkspace']] = self.get_workspace(ws_id=comp['rootWorkspace'])
 
+        # update the find to include field name, but that means create needs that field name
+        # find only works on component name. comps with same name but different attributes will update rather
+        # then creating a 2nd component.
         ind, c = self._find_component(comp=comp)
         if c:
             if self._is_different(c, comp):
@@ -161,7 +172,10 @@ class ArdoqSyncClient(ArdoqClient):
                     self.report['updated_refs'] += 1
                     return ref
             else:
-                logging.debug('create_ref - cache_hit: %s', ref['displayText'])
+                if 'displayText' in ref.keys():
+                    logging.debug(f"create_ref - cache_hit: {ref['displayText']}")
+                else:
+                    logging.debug(f"create_ref - cache_hit: {ref['type']}")
                 self.report['cache_hit_refs'] += 1
                 return r
         if not self.simulate:

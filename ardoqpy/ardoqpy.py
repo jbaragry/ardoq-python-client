@@ -50,6 +50,7 @@ class ArdoqClient(object):
         Example usage::
             ...
     '''
+
     def __init__(self, hosturl=None, token=None, org=None):
         '''
         Create an Ardoq API client.
@@ -68,7 +69,7 @@ class ArdoqClient(object):
         self.org = org
         self.session = requests.Session()
         self.session.cookies.set_policy(BlockAll())  # for stopping cookies that mess up high-volume API calls to ardoq
-        _headers = {'Authorization': 'Token token='+self.token}
+        _headers = {'Authorization': 'Token token=' + self.token}
         self.session.headers.update(_headers)
         self.workspaces = None
         self.workspace = None
@@ -119,11 +120,12 @@ class ArdoqClient(object):
         return self._unwrap_response(resp)
 
     def pprint(self, obj):
-        print (json.dumps(obj, sort_keys=True, indent=4))
+        print(json.dumps(obj, sort_keys=True, indent=4))
 
     '''
     functions for workspaces
     '''
+
     # get all workspaces
     def get_workspaces(self, summary=False):
         self.workspaces = self._get('workspace' if not summary else 'workspace/summary')
@@ -149,7 +151,7 @@ class ArdoqClient(object):
         return res
 
     # delete a workspace
-    def del_workspace(self, ws_id = None):
+    def del_workspace(self, ws_id=None):
         if ws_id is None:
             raise ArdoqClientException('must provide a workspace id')
         res = self._delete('workspace/' + ws_id)
@@ -165,15 +167,16 @@ class ArdoqClient(object):
         res = self._get('workspacefolder/' + folder_id)
         return res
 
-    def move_workspace(self, folder_id = None, ws_list = None):
+    def move_workspace(self, folder_id=None, ws_list=None):
         if ws_list is None and folder_id is None:
             raise ArdoqClientException('must provide a folder id and list of workspaces to move')
-        res = self._put('workspacefolder/' +  folder_id + '/add', {'workspaces': ws_list})
+        res = self._put('workspacefolder/' + folder_id + '/add', {'workspaces': ws_list})
         return res
 
     '''
     functions for models
     '''
+
     # get the model for a given workspace id
     def get_model(self, ws_id=None, model_id=None):
         if ws_id is None:
@@ -194,13 +197,64 @@ class ArdoqClient(object):
     def create_model(self, model=None):
         if model is None:
             raise ArdoqClientException('must provide a model')
-        res=self._post('model', model)
+        res = self._post('model', model)
+
+    def print_model(self, ws_id=None, model_id=None):
+        if ws_id is None:
+            raise ArdoqClientException('must provide a workspaceID')
+        # if self.workspace['_id'] != ws_id:
+        if model_id is None:
+            self.workspace = self._get('workspace' + '/' + ws_id)
+            model_id = self.workspace['componentModel']
+        self.model = self._get('model' + '/' + model_id)
+        print(f"Model id: {self.model['_id']} : {self.model['name']}")
+        for c in self.model['root'].values():
+            print(f"name: {c['name']} - id: {c['id']}")
+        for r in self.model['referenceTypes'].values():
+            print(f"name: {r['name']} - id: {r['id']}")
+
+    def find_reference_type(self, ws_id=None, reftype_name=None):
+        """
+        returns the reference type definition from the model for a specified workspace
+        :param reftype_name: string of the reftype name to find
+        :param ws_id: id of workspace to search for the reftype
+        :return: None if a reference type with that name cannot be found, otherwise the dict of the reftype
+        """
+        if ws_id is None or reftype_name is None:
+            raise ArdoqClientException('must provide a workspace id and name for the reference type to find')
+        ws_model = self.get_model(ws_id = ws_id)
+        rt = [v for k, v in ws_model['referenceTypes'].items() if reftype_name == v['name']]
+        if rt:
+            return rt[0]
+        return None
+
+    def find_component_type(self, ws_id=None, comptype_name=None):
+        """
+        returns the component type definition from the model for a specified workspace
+        recurses through the hierarchy of component types and returns the first with that name
+        :param ws_id: id of workspace to search for the comptype
+        :param comptype_name: string of the comptype name to find
+        :return: None if a comp type with that name cannot be found, otherwise the dict of the type
+        """
+        if ws_id is None or comptype_name is None:
+            raise ArdoqClientException('must provide a workspace id and name for the component type to find')
+        ws_model = self.get_model(ws_id = ws_id)
+
+        def rec_dic_search(dic, val):
+            for k, v in dic.items():
+                if v['name'] == val:
+                    return {k: v}
+                if len(v['children']):
+                    found = rec_dic_search(v['children'], val)
+                    if found is not None:
+                        return found
+
+        return rec_dic_search(ws_model['root'], comptype_name)
 
     def create_field(self, field=None):
         if field is None:
             raise ArdoqClientException('must provide a field')
-        res=self._post('field', field)
-
+        res = self._post('field', field)
 
     def create_component(self, comp=None):
         """
@@ -231,7 +285,7 @@ class ArdoqClient(object):
             # changed get all components to use the search function rather than workspace url
             # this is according to the public API. using the workspace was the old API
             # comp = self._get('workspace/' + ws_id + '/component')
-            comp = self._get('component/search', workspace=ws_id, kwargs=params)
+            comp = self._get('component/search', workspace=ws_id)
         return comp
 
     def update_component(self, comp_id=None, comp=None):
@@ -250,7 +304,7 @@ class ArdoqClient(object):
         if ws_id is None:
             raise ArdoqClientException('must provide a workspace id')
         if comp_name is not None:
-            res= self._get('component/search', workspace=ws_id, name=comp_name)
+            res = self._get('component/search', workspace=ws_id, name=comp_name, field=field_name, value=field_value)
             if exact is True:
                 for r in res:
                     if r['name'] == comp_name:
@@ -258,7 +312,7 @@ class ArdoqClient(object):
                 return []
             return res
         if field_name is not None:
-            res= self._get('component/fieldsearch', workspace=ws_id, **{field_name: field_value})
+            res = self._get('component/fieldsearch', workspace=ws_id, **{field_name: field_value})
             if exact is True:
                 for r in res:
                     if r[field_name] == field_value:
@@ -267,10 +321,10 @@ class ArdoqClient(object):
             return res
         raise ArdoqClientException('must provide a component name, or field name/value pair')
 
-
     '''
     functions for references
     '''
+
     def create_reference(self, ref=None):
         if ref is None:
             raise ArdoqClientException('must provide a reference')
@@ -280,8 +334,8 @@ class ArdoqClient(object):
     def get_reference(self, ws_id=None, ref_id=None):
         if ws_id is None:
             raise ArdoqClientException('must provide a source workspace id')
-        #if ref_id is not None:
-            # comp = self._get('workspace/' + ws_id + '/component/' + comp_id) this is how the upcoming API will work
+        # if ref_id is not None:
+        # comp = self._get('workspace/' + ws_id + '/component/' + comp_id) this is how the upcoming API will work
         if ref_id is None:
             ref_id = ''
         ref = self._get('reference/' + ref_id, workspace=ws_id)
@@ -302,6 +356,7 @@ class ArdoqClient(object):
     '''
     functions for tags
     '''
+
     def create_tag(self, tag=None):
         if tag is None:
             raise ArdoqClientException('must provide a tag')

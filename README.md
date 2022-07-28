@@ -63,6 +63,9 @@ ArdoqClient Implemented:
 - model
     - get by ID
     - get all models and templates
+    - print model to get IDs for component and reference types
+    - find reference_type by name
+    - find component_type by name
 - folder
   - create
   - get by ID and all folders
@@ -115,6 +118,17 @@ or from the console
     ardoq.get_workspaces()
 
 ## Changelog
+- 202207
+  - add find_reference_type to return reftype definition from the metamodel for a workspace 
+  - add find_component_type to return comptype definition from the metamodel for a workspace. Checks full hierarchy
+
+- 202204
+  - add print_model to print component and reference IDs
+
+- 20220228
+  - add PR to include references in get_component function
+  - fixed bug in ardoq_sync when logging ref without displayText
+
 - 20220212
   - deprecated org parameter
   - removed problem with slash on url

@@ -10,15 +10,17 @@ configfile = "./testardoqpy.cfg"
 # configfile = "./ardoqpy.cfg"
 config = configparser.ConfigParser()
 logging.basicConfig(format='%(asctime)s %(message)s', level=logging.DEBUG)
-#log file hardcoded in same dir for now
+# log file hardcoded in same dir for now
 logger = logging.getLogger(__name__)
+
 
 def ardoq_config():
     try:
-        if (len(config.read(configfile)) != 1):
+        if len(config.read(configfile)) != 1:
             raise RuntimeError("Could not read config file ", configfile)
     except:
         raise RuntimeError("could not get config file")
+
 
 def main():
     ardoq_config()
@@ -29,7 +31,7 @@ def main():
     component_id=None
     model_id='54d38789e4b0dcc89b8d8e13'  # application service template in the personal space
     component_type='Application'
-    #TODO move some of these to config
+    # TODO move some of these to config
 
     print('')
     print('--- getting workspaces ---')
@@ -60,7 +62,6 @@ def main():
     except ArdoqClientException as e:
         logger.info (e)
 
-
     print('')
     print('--- getting workspace by ID ---')
     try:
@@ -88,7 +89,6 @@ def main():
         ws_list.append(workspace['_id'])
     except ArdoqClientException as e:
         logger.info (e)
-
 
     print('')
     print('--- get the model for the newly created workspace and show the top level componentTypes ---')
