@@ -113,7 +113,7 @@ To get started, simply install ardoqpy, create an ArdoqClient object and call me
 
 or from the console
 
-    from ardoqpy import ArdoqClient
+    import ardoqpy
     ardoq = ardoqpy.ArdoqClient(hosturl='https://YOURORG.ardoq.com', token='YOURTOKEN')
     ardoq.get_workspaces()
 
