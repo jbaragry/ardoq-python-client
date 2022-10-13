@@ -1,5 +1,7 @@
-#!/usr/bin/env python3
+"""
+client to demonstrate the some of the functionality of ArdoqClient
 
+"""
 import logging
 from ardoqpy import ArdoqClient, ArdoqClientException
 import json
@@ -25,7 +27,7 @@ def ardoq_config():
 def main():
     ardoq_config()
     logger.debug('read config: %s %s', os.getcwd(), config.sections())
-    ardoq = ArdoqClient(hosturl=config['Ardoq']['host'], token=config['Ardoq']['token'], org=config['Ardoq']['org'])
+    ardoq = ArdoqClient(hosturl=config['Ardoq']['host'], token=config['Ardoq']['token'])
     workspaces=None
     workspace=None
     component_id=None

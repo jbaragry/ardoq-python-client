@@ -40,10 +40,15 @@ class ArdoqSyncClient(ArdoqClient):
                 return True
         return False
 
-    def _find_component(self, comp=None):
+    def _find_component(self, comp=None, field_name=None, field_value=None):
         for ind, c in enumerate(self.ws[comp['rootWorkspace']]['components']):
-            if c['name'].lower() == comp['name'].lower() and c['typeId'] == comp['typeId']:
-                return ind, c
+            if field_name is not None:
+                # can't use .lower() when I can't tell if its a string....
+                if c[field_name] == field_value and c['typeId'] == comp['typeId']:
+                    return ind, c
+            else:
+                if c['name'].lower() == comp['name'].lower() and c['typeId'] == comp['typeId']:
+                    return ind, c
         return 0, {}
 
     # find component in cache
@@ -51,13 +56,14 @@ class ArdoqSyncClient(ArdoqClient):
     # name comparison is substring. can be set to exact match with exact param
     def find_component(self, ws_id=None, comp_name=None,
                        field_name=None, field_value=None, exact=False):
-        if ws_id != None and (comp_name != None or field_name != None):
+        if ws_id is not None:
             if ws_id not in self.ws.keys():
                 self.ws[ws_id] = self.get_workspace(ws_id=ws_id)
+        if comp_name is not None and not field_name:
             comps = list()
             for ind, c in enumerate(self.ws[ws_id]['components']):
                 if field_name is not None:
-                    if c['field_name'] == field_value:
+                    if c[field_name] == field_value:
                         comps.append(c)
                         break
                 if exact:
@@ -70,19 +76,21 @@ class ArdoqSyncClient(ArdoqClient):
                         logging.debug('find_component - cache_hit: %s', comp_name)
                         comps.append(c)
             return comps
-        else:
-            res = super().find_component(ws_id=ws_id, comp_name=comp_name, field_name=field_name,
+        else: # why am I calling suprt instead of _find.... because that returns result of enumerate...
+            res = super().find_component(ws_id=ws_id, comp_name=None, field_name=field_name,
                                          field_value=field_value, exact=exact)
             return res
 
-    def create_component(self, comp=None):
-        '''
+    def create_component(self, comp=None, field_name=None, field_value=None):
+        """
         will create a new component
         if component already exists then it will update instead
         find function is based on comp_name only
-        :param comp:
+        :param comp: the component values
+        :param field_name: the field name to use for matching if the component exist. If this param is missing then name will be used
+        :param field_value: the value of the field for the match
         :return:
-        '''
+        """
         # search in cache based on name
         # if its different, then update cache and ardoq
         if comp['rootWorkspace'] not in self.ws.keys():
@@ -91,7 +99,7 @@ class ArdoqSyncClient(ArdoqClient):
         # update the find to include field name, but that means create needs that field name
         # find only works on component name. comps with same name but different attributes will update rather
         # then creating a 2nd component.
-        ind, c = self._find_component(comp=comp)
+        ind, c = self._find_component(comp=comp, field_name=field_name, field_value=field_value)
         if c:
             if self._is_different(c, comp):
                 for k, v in comp.items():

@@ -14,7 +14,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name='ardoqpy',
-    version='0.7.0',
+    version='0.7.1',
     description='A python REST API wrapper for Ardoq - https://ardoq.com.',
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -43,7 +43,8 @@ setup(
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
-        'Programming Language :: Python :: 3.9'
+        'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10'
     ],
 
     keywords='architecture ardoq REST API wrapper tool',

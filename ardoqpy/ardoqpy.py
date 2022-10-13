@@ -89,9 +89,9 @@ class ArdoqClient(object):
 
     def _get(self, resrc, **kwargs):
         url = self.baseurl + resrc
-        kwargs.update({
-            'org': self.org
-        })
+        logger.debug(f"GET {url} with params {kwargs}")
+        if self.org:
+            kwargs['org'] = self.org
         resp = self.session.get(url, params=kwargs)
         return self._unwrap_response(resp)
 
@@ -280,7 +280,8 @@ class ArdoqClient(object):
             raise ArdoqClientException('must provide a workspace id')
         if comp_id is not None:
             # comp = self._get('workspace/' + ws_id + '/component/' + comp_id) this is how the upcoming API will work
-            comp = self._get('component/' + comp_id, params)
+            resc = 'component/' + comp_id
+            comp = self._get(resc, **params)
         else:
             # changed get all components to use the search function rather than workspace url
             # this is according to the public API. using the workspace was the old API
