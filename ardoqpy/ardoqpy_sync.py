@@ -140,7 +140,7 @@ class ArdoqSyncClient(ArdoqClient):
                        if c['_id'] == comp['_id'])
             self.ws[comp['rootWorkspace']]['components'][ind] = res
             self.report['updated_comps'] += 1
-            self.report['new_comps_l'].append({'_id': res['_id'], 'name': res['name'], 'type': res['type']})
+            self.report['updated_comps_l'].append({'_id': res['_id'], 'name': res['name'], 'type': res['type']})
             return res
         else:
             self.report['updated_comps'] += 1
