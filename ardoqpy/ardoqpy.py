@@ -51,21 +51,29 @@ class ArdoqClient(object):
             ...
     '''
 
-    def __init__(self, hosturl=None, token=None, org=None):
+    def __init__(self, hosturl=None, token=None, org=None, version='v1'):
         '''
-        Create an Ardoq API client.
+        Create an Ardoq API client for a specific version of the ardoq rest API
+        Cannot mix versions. Either v1 or v2
         :param hosturl: The Ardoq installation you wish to connect to (default removed. Must have org url)
         :param token: An authorization token
         :param org:
             organization to use. This is now deprecated. But kept for backwards compatibility
+        :param version: API version number. 'v1' or 'v2'. defaults to 'v1'.
         '''
 
         if hosturl[-1] == '/':
             hosturl = hosturl[:-1]
-        self.baseurl = hosturl + '/api/'
+        self.hosturl = hosturl
+        self.version = version
+        logging.info(f"creating Ardoq Client for API version {version}")
+        if version == 'v2':
+            self.baseurl = hosturl + '/api/v2/'
+        else:
+            self.baseurl = hosturl + '/api/'
         self.token = token
         if org:
-            logging.warning("org parameter is now DEPRECATED. It should be specified in the URL")
+            logging.warning("org parameter is now DEPRECATED. The org should be specified in the URL")
         self.org = org
         self.session = requests.Session()
         self.session.cookies.set_policy(BlockAll())  # for stopping cookies that mess up high-volume API calls to ardoq
@@ -93,6 +101,14 @@ class ArdoqClient(object):
         if self.org:
             kwargs['org'] = self.org
         resp = self.session.get(url, params=kwargs)
+        return self._unwrap_response(resp)
+
+    def _patch(self, resrc, payload, **kwargs):
+        url = self.baseurl + resrc
+        kwargs.update({
+            'org': self.org
+        })
+        resp = self.session.patch(url, json=payload, params=kwargs)
         return self._unwrap_response(resp)
 
     def _post(self, resrc, payload, **kwargs):
@@ -182,10 +198,13 @@ class ArdoqClient(object):
         if ws_id is None:
             raise ArdoqClientException('must provide a workspaceID')
         # if self.workspace['_id'] != ws_id:
-        if model_id is None:
-            self.workspace = self._get('workspace' + '/' + ws_id)
-            model_id = self.workspace['componentModel']
-        self.model = self._get('model' + '/' + model_id)
+        if self.version == 'v1':
+            if model_id is None:
+                self.workspace = self._get('workspace' + '/' + ws_id)
+                model_id = self.workspace['componentModel']
+            self.model = self._get('model' + '/' + model_id)
+        else: # v2
+            self.model = self._get(f"workspaces/{ws_id}/context")
         return self.model
 
     # get all model for and organisation
@@ -249,7 +268,28 @@ class ArdoqClient(object):
                     if found is not None:
                         return found
 
-        return rec_dic_search(ws_model['root'], comptype_name)
+        if self.version == 'v1':
+            return rec_dic_search(ws_model['root'], comptype_name)
+        else:  # v2
+            ct = [v for v in ws_model['componentTypes'] if comptype_name == v['name']]
+            if ct:
+                return ct[0]
+        return None
+
+    def get_field(self, field_id=None):
+        """
+        this returns the list of fields direct.
+        the componenetTypes and referenceTypes lists only have those comps/refs that are explicity named
+        if you want all components, including those matched by selecting 'include all in this WS' then
+        you need to check if global=True and fetch component types from the model ID in the model attribute
+        :param field_id:
+        :return:
+        """
+        resc = 'field'
+        if field_id:
+            resc = resc + '/' + field_id
+        field = self._get(resc)
+        return field
 
     def create_field(self, field=None):
         if field is None:
@@ -267,32 +307,53 @@ class ArdoqClient(object):
         res = self._post('component', comp)
         return res
 
-    def get_component(self, ws_id=None, comp_id=None, incl_refs=False):
+    def get_component(self, ws_id=None, comp_id=None, incl_refs=False, params=None):
         """
+        returns a single component based om the ID, all components in a workspace,
+            or a set of components based on search fields
         :param self:
-        :param ws_id: mandatory, get component within this workspace
+        :param ws_id: optional, get component within this workspace. This parameter is kept from a very
+            early version of the v1 API
         :param comp_id: id for the component to get. If None, then gets all components for that workspace
-        :param incl_refs: an optional boolean, wether the components references should be fetched
-        :return: component created in ardoq
+        :param incl_refs: v1 param. an optional boolean, whether the components references should be fetched
+        :param params: v2 param. set of key value pairs to use for limiting the search results to a set of components
+        :return: component(s)
         """
-        params = {'includeReferences': str(incl_refs).lower()}
-        if ws_id is None and comp_id is None:
-            raise ArdoqClientException('must provide a workspace id')
-        if comp_id is not None:
-            # comp = self._get('workspace/' + ws_id + '/component/' + comp_id) this is how the upcoming API will work
-            resc = 'component/' + comp_id
-            comp = self._get(resc, **params)
-        else:
-            # changed get all components to use the search function rather than workspace url
-            # this is according to the public API. using the workspace was the old API
-            # comp = self._get('workspace/' + ws_id + '/component')
-            comp = self._get('component/search', workspace=ws_id)
+
+        if ws_id is None and comp_id is None and params is None:
+            raise ArdoqClientException('must provide a workspace id, component id, or search params')
+        if self.version == 'v1':
+            params = {'includeReferences': str(incl_refs).lower()}
+            if comp_id is not None:
+                resc = 'component/' + comp_id
+                comp = self._get(resc, **params)
+            else:
+                # changed get all components to use the search function rather than workspace url
+                # this is according to the public API. using the workspace was the old API
+                # comp = self._get('workspace/' + ws_id + '/component')
+                comp = self._get('component/search', workspace=ws_id)
+        else:  # v2
+            if comp_id:
+                resc = 'components/' + comp_id
+                comp = self._get(resc)
+            else:
+                if not params:  # limit search to one workspace if no other search given
+                    params = {'rootWorkspace': ws_id}
+                resc = 'components'
+                comp = self._get(resc, **params)
         return comp
 
     def update_component(self, comp_id=None, comp=None):
         if comp_id is None or comp is None:
             raise ArdoqClientException('must provide a component id, and component')
         res = self._put('component/' + comp_id, comp)
+        return res
+
+    def patch_component(self, comp_id=None, version='latest', payload=None):
+        if comp_id is None or payload is None:
+            raise ArdoqClientException('must provide a component id, and component fields to update')
+        params = {'ifVersionMatch': version}
+        res = self._patch('components/' + comp_id, payload, **params)
         return res
 
     def del_component(self, comp_id=None):
@@ -372,3 +433,14 @@ class ArdoqClient(object):
         if ws_id is not None and tag_id is None:
             tag = self._get('tag/' + 'workspace/' + ws_id)
         return tag
+
+    def get_current_user(self):
+        '''
+
+        :return: information about the current user
+        '''
+        if self.version == 'v2':
+            current_user = self._get('me/')
+        else:
+            current_user = self._get('user/current_user')
+        return current_user

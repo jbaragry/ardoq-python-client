@@ -108,6 +108,7 @@ class ArdoqSyncClient(ArdoqClient):
                     res = super().update_component(comp_id=c['_id'], comp=c)
                     self.ws[comp['rootWorkspace']]['components'][ind] = res
                     self.report['updated_comps'] += 1
+                    self.report['updated_comps_l'].append({'_id': res['_id'], 'name': res['name'], 'type': res['type']})
                     return(res)
                 else:
                     self.report['updated_comps'] += 1
@@ -115,6 +116,7 @@ class ArdoqSyncClient(ArdoqClient):
             else:
                 logging.debug('create_component - cache_hit: %s', comp['name'])
                 self.report['cache_hit_comps'] += 1
+                self.report['cache_hit_comps_l'].append({'_id': comp['_id'], 'name': comp['name'], 'type': comp['type']})
                 return c
         if not self.simulate:
             res = super().create_component(comp=comp)
@@ -138,6 +140,7 @@ class ArdoqSyncClient(ArdoqClient):
                        if c['_id'] == comp['_id'])
             self.ws[comp['rootWorkspace']]['components'][ind] = res
             self.report['updated_comps'] += 1
+            self.report['new_comps_l'].append({'_id': res['_id'], 'name': res['name'], 'type': res['type']})
             return res
         else:
             self.report['updated_comps'] += 1
@@ -147,6 +150,7 @@ class ArdoqSyncClient(ArdoqClient):
         if not self.simulate:
             res = super().del_component(comp_id=comp_id)
             self.report['del_comps'] += 1
+            self.report['del_comps_l'].append({'_id': res['_id'], 'name': res['name'], 'type': res['type']})
             return res
         else:
             self.report['del_comps'] += 1
@@ -230,9 +234,12 @@ class ArdoqSyncClient(ArdoqClient):
 
     def init_report(self):
         # TODO: can remove the number keys that also have lists. Original dict didn't have the list vals
-        self.report = {'new_comps': 0, 'new_comps_l': [], 'updated_comps': 0, 'del_comps': 0,
+        self.report = {'new_comps': 0, 'new_comps_l': [],
+                       'updated_comps': 0, 'updated_comps_l': [],
+                       'del_comps': 0, 'del_comps_l': [],
                        'new_refs': 0, 'updated_refs': 0, 'del_refs': 0,
-                       'cache_hit_comps': 0, 'cache_hit_refs': 0,
-                       'cache_miss_comps': [], # list of components
-                       'cache_miss_refs': [], # list of refs
+                       'cache_hit_comps': 0, 'cache_hit_comps_l': [],
+                       'cache_hit_refs': 0,
+                       'cache_miss_comps': [],  # list of components
+                       'cache_miss_refs': [],  # list of refs
                        'status': 'success', 'description': None}

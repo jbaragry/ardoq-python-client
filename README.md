@@ -1,4 +1,4 @@
-# Ardoqpy - a Python3 client for The Ardoq REST API
+# Ardoqpy - a Python client for The Ardoq REST API
 
 ## Description
 
@@ -115,9 +115,15 @@ or from the console
 
     from ardoqpy import ArdoqClient
     ardoq = ardoqpy.ArdoqClient(hosturl='https://YOURORG.ardoq.com', token='YOURTOKEN')
+    # to use v2 API
+    ardoq = ardoqpy.ArdoqClient(hosturl='https://YOURORG.ardoq.com', token='YOURTOKEN', version='v2')
     ardoq.get_workspaces()
 
 ## Changelog
+- 202303
+  - added audit log for support for components created, updated, deleted, and skipped due to cache_hit
+- 202211
+  - added support for Ardoq v2 REST API. Only for the ArdoqClient (not SyncClient)
 - 202207
   - add find_reference_type to return reftype definition from the metamodel for a workspace 
   - add find_component_type to return comptype definition from the metamodel for a workspace. Checks full hierarchy
