@@ -116,7 +116,7 @@ class ArdoqSyncClient(ArdoqClient):
             else:
                 logging.debug('create_component - cache_hit: %s', comp['name'])
                 self.report['cache_hit_comps'] += 1
-                self.report['cache_hit_comps_l'].append({'_id': c['_id'], 'name': comp['name'], 'type': comp['type']})
+                self.report['cache_hit_comps_l'].append({'_id': c['_id'], 'name': c['name'], 'type': c['type']})
                 return c
         if not self.simulate:
             res = super().create_component(comp=comp)
