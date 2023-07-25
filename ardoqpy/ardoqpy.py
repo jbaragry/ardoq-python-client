@@ -434,6 +434,18 @@ class ArdoqClient(object):
             tag = self._get('tag/' + 'workspace/' + ws_id)
         return tag
 
+    def update_tag(self, tag_id=None, tag=None):
+        if tag_id is None or tag is None:
+            raise ArdoqClientException('must provide a tag id, and tag')
+        res = self._put('tag/' + tag_id, tag)
+        return res
+
+    def del_tag(self, tag_id=None):
+        if tag_id is None:
+            raise ArdoqClientException('must provide a tag id')
+        res = self._delete('tag/' + tag_id)
+        return res
+
     def get_current_user(self):
         '''
 

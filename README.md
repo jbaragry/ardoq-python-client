@@ -60,6 +60,8 @@ ArdoqClient Implemented:
     - get by ID
     - get all for workspace
     - create
+    - update
+    - delete
 - model
     - get by ID
     - get all models and templates
@@ -120,6 +122,8 @@ or from the console
     ardoq.get_workspaces()
 
 ## Changelog
+- 202307
+  - added del and update tag
 - 202303
   - added audit log for support for components created, updated, deleted, and skipped due to cache_hit
 - 202211
@@ -169,7 +173,7 @@ or from the console
     
 
 ## TODO
-- complete the full REST-API for fields and tags
+- complete the full REST-API for fields
 
 ## License
 The ardoq-python-client is licensed under the MIT License
