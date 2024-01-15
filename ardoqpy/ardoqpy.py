@@ -399,14 +399,24 @@ class ArdoqClient(object):
         res = self._post('reference', ref)
         return res
 
-    def get_reference(self, ws_id=None, ref_id=None):
+    def get_reference(self, ws_id=None, ref_id=None, params=None):
         if ws_id is None:
             raise ArdoqClientException('must provide a source workspace id')
         # if ref_id is not None:
         # comp = self._get('workspace/' + ws_id + '/component/' + comp_id) this is how the upcoming API will work
-        if ref_id is None:
-            ref_id = ''
-        ref = self._get('reference/' + ref_id, workspace=ws_id)
+        if self.version == 'v1':
+            if ref_id is None:
+                ref_id = ''
+            ref = self._get('reference/' + ref_id, workspace=ws_id)
+        else:  # v2
+            if ref_id:
+                resc = 'references/' + ref_id
+                ref = self._get(resc)
+            else:
+                if not params:  # limit search to one workspace if no other search given
+                    params = {'rootWorkspace': ws_id}
+                resc = 'references'
+                ref = self._get(resc, **params)
         return ref
 
     def del_reference(self, ref_id=None):
