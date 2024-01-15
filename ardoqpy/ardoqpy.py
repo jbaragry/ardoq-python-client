@@ -144,7 +144,10 @@ class ArdoqClient(object):
 
     # get all workspaces
     def get_workspaces(self, summary=False):
-        self.workspaces = self._get('workspace' if not summary else 'workspace/summary')
+        if self.version == 'v1':
+            self.workspaces = self._get('workspace' if not summary else 'workspace/summary')
+        else: # v2
+            self.workspaces = self._get('workspaces')
         return self.workspaces
 
     # gets the workspace using either the workspace ID or name
@@ -154,10 +157,13 @@ class ArdoqClient(object):
     def get_workspace(self, ws_id=None, aggregated=False):
         if ws_id is None:
             raise ArdoqClientException("need an id for get_workspace")
-        endpoint = 'workspace' + '/' + ws_id
-        if aggregated:
-            endpoint += '/aggregated'
-        self.workspace = self._get(endpoint)
+        if self.version == 'v1':
+            endpoint = 'workspace' + '/' + ws_id
+            if aggregated:
+                endpoint += '/aggregated'
+            self.workspace = self._get(endpoint)
+        else:  # v2
+            self.workspace = self._get('workspaces/' + ws_id)
         return self.workspace
 
     def create_workspace(self, ws=None):
@@ -445,6 +451,15 @@ class ArdoqClient(object):
             raise ArdoqClientException('must provide a tag id')
         res = self._delete('tag/' + tag_id)
         return res
+
+'''
+    def get_report(self, id=None):
+        if self.version == 'v1':
+            logger.debug(f"get report called with v1 client")
+            raise ArdoqClientException('report called with v1 client. must be v2 client')
+        if not id:
+            res = self._get()
+'''
 
     def get_current_user(self):
         '''

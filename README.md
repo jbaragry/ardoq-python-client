@@ -123,6 +123,8 @@ or from the console
 
 ## Changelog
 - 202307
+  - added workspace and workspaces endpoints for v2 client
+- 202307
   - added del and update tag
 - 202303
   - added audit log for support for components created, updated, deleted, and skipped due to cache_hit
