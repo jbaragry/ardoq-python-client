@@ -3,7 +3,7 @@
 ## Description
 
 Ardoqpy is a thin client library for the [Ardoq](https://ardoq.com) REST API.
-It consists of 2 clients
+It consists of 3 clients
 - ArdoqClient
     - thin client for the rest-api
 - ArdoqSyncClient
@@ -23,6 +23,9 @@ It consists of 2 clients
             - fieldname == fieldvalue (you need to ensure the types can handle equivalence)
                 - fieldname, if not None, is checked first
     - can be run in simulate mode which updates the report but does not execute write operations in ardoq
+- Ardoq V2 Client
+  - this is a copy of the client provided by ardoq in their developer portal
+  - v2 api functionality can be used from this client or built into the original ArdoqClient
 
 ## Documentation
 (see the test client for examples)
@@ -122,6 +125,9 @@ or from the console
     ardoq.get_workspaces()
 
 ## Changelog
+- 202401
+  - add get reference for v2 client
+  - added v2 api client. This is a copy of the one provided by ardoq on the developer portal
 - 202307
   - added workspace and workspaces endpoints for v2 client
 - 202307

@@ -462,18 +462,8 @@ class ArdoqClient(object):
         res = self._delete('tag/' + tag_id)
         return res
 
-'''
-    def get_report(self, id=None):
-        if self.version == 'v1':
-            logger.debug(f"get report called with v1 client")
-            raise ArdoqClientException('report called with v1 client. must be v2 client')
-        if not id:
-            res = self._get()
-'''
-
     def get_current_user(self):
         '''
-
         :return: information about the current user
         '''
         if self.version == 'v2':
