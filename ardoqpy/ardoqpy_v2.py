@@ -201,10 +201,10 @@ class API:
         return self._request("/batch", method="POST", data=data)
 
     def reports(self):
-        return self._request("/incubating/reports", method="GET")
+        return self._request("/reports", method="GET")
 
     def report(self, id):
-        return self._request("/incubating/reports/" + id, method="GET")
+        return self._request("/reports/" + id, method="GET")
 
     def report_run(self, id, view):
-        return self._request("/incubating/reports/" + id + "/run/" + view, method="GET")
+        return self._request("/reports/" + id + "/run/" + view, method="GET")
